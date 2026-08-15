@@ -52,24 +52,24 @@ export default async function handler(req, res) {
     let instrucaoEstiloVisual = "";
     if (estilo && estilo.includes("Clean")) {
       instrucaoEstiloVisual = `ESTILO SOLICITADO: Clean e Claro (Minimalista).
-- O fundo do site DEVE SER CLARO (ex: #ffffff, #f8fafc ou #f1f5f9).
-- Textos principais em cores escuras e legíveis (ex: #0f172a, #1e293b).
-- Cards com fundo branco, sombras suaves (shadow-lg) e bordas discretas (#e2e8f0).
-- NUNCA use fundo preto/escuro global se essa opção foi selecionada.`;
+- O fundo do site DEVE SER CLARO (ex: #ffffff ou #f8fafc).
+- Textos principais em cores escuras e legíveis (#0f172a, #1e293b).
+- Cards com fundo branco (#ffffff), sombras suaves (shadow-xl) e bordas discretas (#e2e8f0).
+- NUNCA use fundo escuro global se essa opção foi selecionada.`;
     } else if (estilo && estilo.includes("Colorido")) {
       instrucaoEstiloVisual = `ESTILO SOLICITADO: Colorido e Vibrante.
-- Utilize gradientes chamativos e modernos, combinando a cor primaria (${cor_primaria || '#6366f1'}) e a cor secundaria (${cor_secundaria || '#22c55e'}).
+- Utilize gradientes chamativos e modernos combinando a cor primaria (${cor_primaria || '#6366f1'}) e a cor secundaria (${cor_secundaria || '#22c55e'}).
 - Design dinâmico, alegre, com cards e badges bem destacados.`;
     } else if (estilo && estilo.includes("Elegante")) {
       instrucaoEstiloVisual = `ESTILO SOLICITADO: Elegante e Luxuoso.
-- Fundo escuro sofisticado (#090d16) com detalhes em Dourado/Bronze e paleta elegante.
-- Bordas finas brilhantes, fontes refinadas e sombras profundas.`;
+- Fundo escuro sofisticado (#090d16) com detalhes em Dourado/Bronze e paleta refinada.
+- Bordas finas brilhantes, fontes luxuosas e sombras profundas.`;
     } else {
       instrucaoEstiloVisual = `ESTILO SOLICITADO: Moderno e Escuro (Dark Mode).
 - Fundo escuro luxuoso (#0b0f17) com cards semitransparentes em glassmorphism.`;
     }
 
-    // PROMPT MASTER COMPLETO
+    // PROMPT MASTER MAGNATA
     const promptMaster = `
 Você é um Engenheiro de Software Front-end e UX/UI Designer Sênior de nível internacional, especialista em criação de landing pages modernas, responsivas, visualmente sofisticadas e focadas em alta conversão.
 Sua missão é criar o código HTML5 completo de uma landing page de altíssima qualidade com base nas preferências selecionadas pelo usuário.
@@ -77,9 +77,10 @@ Sua missão é criar o código HTML5 completo de uma landing page de altíssima 
 DIRETRIZES DE ESTILO VISUAL:
 ${instrucaoEstiloVisual}
 
-REGRAS RÍGIDAS DE TÉCNICA E CÓDIGO:
-O código deve ser entregue em HTML5 completo, funcional e sem erros de codificação. Não utilize caracteres corrompidos.
-O HTML DEVE iniciar obrigatoriamente com:
+REGRAS RÍGIDAS DE TIPOGRAFIA E ESTÉTICA:
+- O HTML DEVE utilizar a fonte ultra-profissional 'Plus Jakarta Sans' importada do Google Fonts.
+- A tipografia DEVE ser extremamente legível, moderna e elegante, com excelente contraste de texto.
+- O HTML DEVE iniciar obrigatoriamente com:
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -90,11 +91,12 @@ O HTML DEVE iniciar obrigatoriamente com:
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     .container-custom { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    .faq-answer { transition: max-height 0.3s ease, opacity 0.3s ease; }
   </style>
 </head>
 
@@ -113,45 +115,60 @@ DADOS DA EMPRESA E DO CLIENTE:
 INSTRUÇÃO DE IMAGENS PERSONALIZADAS:
 ${instrucaoGaleriaImagens}
 
-DEPOIMENTOS — OBRIGATÓRIO:
-Crie exatamente 3 cards de depoimentos de clientes satisfeitos com depoimentos realistas.
-Utilize obrigatoriamente estas imagens estáticas nos <img> dos depoimentos:
-- Cliente 1: https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80
-- Cliente 2: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80
-- Cliente 3: https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80
-Cada card deve ter a foto do cliente, nome, avaliação com 5 estrelas amarelas (<i class="fas fa-star text-yellow-400"></i>) e um texto explicativo e elogioso.
+DEPOIMENTOS — REGRA RÍGIDA DE NOMES E FOTOS:
+Crie exatamente 3 cards de depoimentos de clientes satisfeitos.
+Os nomes dos clientes DEVEM SER EXATAMENTE ESTES:
+1. Primeiro Depoimento: Nome "Ana Clara" | Foto: https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80
+2. Segundo Depoimento: Nome "João Lucas" | Foto: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80
+3. Terceiro Depoimento: Nome "Natália Oliveira" | Foto: https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80
 
-FAQ (PERGUNTAS FREQUENTES COM RESPOSTAS) — OBRIGATÓRIO:
-- Crie uma seção com EXATAMENTE 6 a 8 perguntas frequentes relevantes sobre o nicho (${nicho}).
-- CADA PERGUNTA DEVE CONTER UMA RESPOSTA COMPLETA, ÚTIL E BEM ESCRITA!
-- Implemente um sistema de acordeão funcional em JavaScript (click na pergunta revela/esconde o parágrafo da resposta com animação suave).
-- JAMAIS Deixe perguntas vazias ou sem o texto da resposta explicativa!
+Cada card DEVE conter:
+- Foto de perfil arredondada com borda elegante na cor primária (${cor_primaria || '#6366f1'})
+- O NOME EXATO especificado acima em destaque em negrito
+- Avaliação com 5 estrelas amarelas (<i class="fas fa-star text-yellow-400"></i>)
+- Texto de depoimento realista, elogioso e diretamente relacionado ao segmento (${nicho}).
+
+FAQ (PERGUNTAS FREQUENTES COM RESPOSTAS VISÍVEIS E INTERATIVAS) — OBRIGATÓRIO:
+- Crie uma seção de FAQ com EXATAMENTE 6 a 8 perguntas frequentes essenciais do segmento (${nicho}).
+- CADA PERGUNTA DEVE POSSUIR UMA RESPOSTA BEM ESCRITA, DETALHADA E PERFEITAMENTE VISÍVEL!
+- A cor do texto da resposta DEVE TER ALTO CONTRASTE com o fundo do card para ser LIDA COM FACILIDADE (Exemplo: em tema claro, use text-slate-700; em tema escuro, use text-slate-300).
+- Estruture cada item do FAQ com um botão (<button class="faq-btn">) com ícone de seta ou soma (+ / -) e a resposta logo abaixo em uma div (<div class="faq-content hidden p-4">).
+- As respostas DEVEM ser visíveis e expansíveis ao clicar de forma totalmente fluida.
 
 ESTRUTURA COMPLETA DA LANDING PAGE:
 1. HEADER FIXO com efeito Blur, logo/nome, links de navegação e botão CTA destacado para o WhatsApp. Menu mobile funcional.
-2. HERO SECTION impactante com Headline gigante, subhead persuasivo, badges de autoridade e botão principal estilo CTA.
+2. HERO SECTION impactante com Headline gigante e elegante, subhead persuasivo, badges de autoridade e botão CTA principal.
 3. SEÇÃO DE ESTATÍSTICAS / NÚMEROS (Ex: +500 Clientes Atendidos, 99% Satisfação, +5 Anos).
-4. SEÇÃO SOBRE A EMPRESA com a história, missão e diferenciais.
-5. SEÇÃO DE SERVIÇOS E SOLUÇÕES em Grid de Cards com ícones FontAwesome e animações no hover.
+4. SEÇÃO SOBRE A EMPRESA apresentando a história, missão e diferenciais.
+5. SEÇÃO DE SERVIÇOS E SOLUÇÕES em Grid de Cards com ícones FontAwesome e hover elegante.
 6. SEÇÃO BENEFÍCIOS E DIFERENCIAIS.
-7. SEÇÃO "COMO FUNCIONA" (3 a 5 passos).
-8. GALERIA DE IMAGENS PERSONALIZADAS (Somente se fornecidas. Se não houver, ignore e não crie quadros vazios).
-9. SEÇÃO DE DEPOIMENTOS (3 cards completos com foto e estrelas).
-10. SEÇÃO FAQ COMPLETA (Perguntas + Respostas detalhadas em acordeão funcional em JS).
+7. SEÇÃO "COMO FUNCIONA" (3 a 5 passos bem visuais).
+8. GALERIA DE IMAGENS PERSONALIZADAS (Apenas se fornecidas no briefing. Se não houver, ignore e não crie quadros vazios).
+9. SEÇÃO DE DEPOIMENTOS (Os 3 cards obrigatórios com Ana Clara, João Lucas e Natália Oliveira com 5 estrelas).
+10. SEÇÃO FAQ COMPLETA (Perguntas + Respostas detalhadas em alta visibilidade e com acordeão interativo funcional).
 11. CTA FINAL persuasivo direcionando para o WhatsApp.
 12. FOOTER completo e centralizado.
 
-ANIMAÇÕES:
-- Inclua animações AOS ('data-aos="fade-up"') em seções, headlines, botões, cards e depoimentos.
-- Antes do </body>, inclua a inicialização da biblioteca AOS e o script JS do Acordeão do FAQ:
+ANIMAÇÕES E SCRIPTS:
+Antes do fechamento do </body>, inclua a inicialização do AOS e o Script JS do FAQ:
   <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
   <script>
     AOS.init({ duration: 800, once: true });
-    // Script funcional do FAQ
-    document.querySelectorAll('.faq-toggle').forEach(button => {
-      button.addEventListener('click', () => {
-        const content = button.nextElementSibling;
-        content.classList.toggle('hidden');
+    
+    // Script Interativo Profissional do FAQ
+    document.addEventListener('DOMContentLoaded', () => {
+      const faqButtons = document.querySelectorAll('.faq-btn');
+      faqButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const content = btn.nextElementSibling;
+          const icon = btn.querySelector('.faq-icon');
+          if (content) {
+            content.classList.toggle('hidden');
+            if (icon) {
+              icon.classList.toggle('rotate-180');
+            }
+          }
+        });
       });
     });
   </script>
@@ -172,7 +189,7 @@ Não utilize Markdown nem blocos de código tipo \`\`\`html.
       body: JSON.stringify({
         model: "qwen-max",
         messages: [
-          { role: "system", content: "Você é um compilador de código HTML/Tailwind de nível internacional. Retorne EXCLUSIVAMENTE o código HTML5 puro funcional, respeitando o tema visual escolhido pelo usuário, sem markdown, sem caixas de código e sem texto explicativo." },
+          { role: "system", content: "Você é um compilador de código HTML/Tailwind de nível internacional. Retorne EXCLUSIVAMENTE o código HTML5 puro funcional, respeitando o tema visual escolhido, usando a fonte Plus Jakarta Sans, com depoimentos de Ana Clara, João Lucas e Natália Oliveira, e FAQ com respostas claras e visíveis sem markdown." },
           { role: "user", content: promptMaster }
         ],
         temperature: 0.5
@@ -197,7 +214,7 @@ Não utilize Markdown nem blocos de código tipo \`\`\`html.
 
     // Notificação do Robô no Railway
     const URL_ROBO = 'https://bot-whatsapp-production-c379.up.railway.app/send-message';
-    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional foi gerado com sucesso no estilo ${estilo || 'selecionado'}!\n\nAcesse a plataforma para visualizar a prévia completa.`;
+    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional Premium foi gerado com sucesso!\n\nAcesse a plataforma para visualizar a prévia completa.`;
 
     try {
       await fetch(URL_ROBO, {
