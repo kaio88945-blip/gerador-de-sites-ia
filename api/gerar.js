@@ -77,11 +77,11 @@ export default async function handler(req, res) {
     const QWEN_API_KEY = process.env.QWEN_API_KEY || "sk-ws-H.DMEDIDR.A3e2.MEQCIBYvIBLMRQFijb7-GkusJzYzSbGUbSgRRNT_OFjGY2A3AiBvQiqyvky59UjJrwnpj6LhN6wSYGUfT6wqE3hnFSyhWQ";
     const QWEN_URL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions";
 
-    // 5. PROMPT MASTER COMPLETO, EXTENSO E REFINADO
+    // 5. PROMPT MASTER COMPLETO COM DESIGN ULTRA MODERNO
     const promptMaster = `
 PROMPT MESTRE — GERADOR DE SITES DE ALTA PERFORMANCE E CONVERSÃO (2026)
 
-Você é um Engenheiro de Software Front-End Sênior e Lead Designer UI/UX. Sua missão é criar um site HTML5 completo, robusto, extenso, moderno e visualmente impecável.
+Você é um Engenheiro de Software Front-End Sênior e Lead Designer UI/UX. Sua missão é criar um site HTML5 completo, robusto, extenso, ultra-moderno e visualmente impecável.
 
 =====================================================
 REGRA CRÍTICA #1: PROIBIDO USAR FOTOS UNSPLASH COMO IMAGEM DE FUNDO
@@ -177,11 +177,21 @@ ESTRUTURA DETALHADA E SEÇÕES DO SITE
   2. "João Lucas" | Foto: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80
   3. "Natália Oliveira" | Foto: https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80
 
-7. FAQ REDESENHADO, LINDO E COM RESPOSTAS RICAS (EXATAMENTE 8 PERGUNTAS):
-- Crie um FAQ visualmente deslumbrante com cards bem acabados, sombras sutis, bordas arredondadas e ícones animáveis (+ / - ou seta).
-- CADA UMA DAS 8 PERGUNTAS DEVE POSSUIR UMA RESPOSTA EXTENSA, COMPLETA, DETALHADA E PERFEITAMENTE VISÍVEL DENTRO DO ACORDEÃO.
-- Escreva respostas que passem autoridade, tirem dúvidas reais sobre o nicho (${nicho}), prazos, formas de contato e processo.
-- Insira o script JavaScript que permite abrir e fechar a resposta com animação suave e transição fluida ao clicar.
+=====================================================
+REGRA DE DESIGN DO FAQ: MÓDULOS INTERATIVOS E VISUALMENTE ESPETACULARES
+=====================================================
+- A seção de FAQ DEVE ser um dos módulos visualmente mais bonitos e impactantes do site.
+- Crie EXATAMENTE 8 PERGUNTAS E RESPOSTAS extremamente relevantes para o nicho (${nicho}).
+- ESTRUTURA VISUAL DOS CARDS DE FAQ:
+  * Cards em layout de grade única ou duas colunas assimétricas.
+  * Cada card do FAQ deve ter borda sutil com brilho suave (border: 1px solid rgba(255,255,255,0.1) ou border-slate-200), efeito de transição no hover e fundo estilizado (Glassmorphism / Neumorphism).
+  * Inclua uma badge numerada elegante para cada pergunta (Ex: "01", "02", "03"... em destaque com a cor primária ${cor_primaria}).
+  * O botão da pergunta deve ter um ícone dinâmico em círculo (<div class="faq-icon-wrapper flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary">) com seta ou sinal de mais (+) que gira 180 graus de forma totalmente fluida ao abrir.
+  * CADA UMA DAS 8 RESPOSTAS DEVE SER RICA, COMPLETA, EXTENSA E TOTALMENTE VISÍVEL DENTRO DO PAINEL EXPANSÍVEL.
+  * O texto das respostas deve ter contraste alto, excelente espaçamento de linha e tipografia cristalina.
+- FUNCIONALIDADE INTERATIVA EM JAVASCRIPT:
+  * Ao clicar em uma pergunta, a resposta deve deslizar suavemente (max-height e opacity transition).
+  * Fechamento automático dos outros itens ou abertura independente ultra-fluida.
 
 8. SEÇÃO DE CONTATO E FOOTER COMPLETO:
 - Bloco final de alta conversão convidando o cliente para conversar no WhatsApp (${whatsappLimpo}).
@@ -218,7 +228,7 @@ NÃO escreva nenhuma introdução, explicação ou comentário antes ou depois d
         messages: [
           { 
             role: "system", 
-            content: "Você é um compilador de código HTML/Tailwind CSS de nível internacional. Sua função é gerar EXCLUSIVAMENTE o código HTML5 puro, sem explicações, sem fotos Unsplash de fundo, sem texto antes ou depois e sem blocos de código Markdown." 
+            content: "Você é um compilador de código HTML/Tailwind CSS de nível internacional. Sua função é gerar EXCLUSIVAMENTE o código HTML5 puro, sem explicações, sem fotos Unsplash de fundo, com FAQ super interativo e lindo com respostas completas, sem texto antes ou depois e sem blocos de código Markdown." 
           },
           { 
             role: "user", 
