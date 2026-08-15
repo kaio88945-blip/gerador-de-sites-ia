@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  // Configurações de CORS para aceitar chamadas da Vercel/Front-end
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -11,18 +12,20 @@ export default async function handler(req, res) {
     const { nome, whatsapp, nicho, descricao, imagens_personalizadas } = dados;
 
     if (!whatsapp) {
-      return res.status(400).json({ success: false, error: 'Número de WhatsApp é obrigatório!' });
+      return res.status(400).json({ success: false, error: 'O número de WhatsApp é obrigatório!' });
     }
 
+    // 1. Tratamento do número de WhatsApp
     let numeroLimpo = String(whatsapp).replace(/\D/g, '');
     if (!numeroLimpo.startsWith('55')) {
       numeroLimpo = '55' + numeroLimpo;
     }
 
-    const GROQ_API_KEY = process.env.GROQ_API_KEY || "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";
-    const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
+    // 2. CHAVE DA API DO GEMINI
+    const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AQ.Ab8RN6ID9x8n7fsfNckbQfChF4pdBYH-K3bO8vjPZsLcRufgMg";
+    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
-    // Trata e valida se o cliente realmente enviou imagens
+    // 3. Tratamento das imagens enviadas pelo cliente
     let instrucaoGaleriaImagens = "O CLIENTE NÃO ENVIOU IMAGENS PERSONALIZADAS. NUNCA CRIE UMA GALERIA OU QUADROS DE IMAGEM VAZIOS/SKELETONS NA PÁGINA. IGNORE ESSA SEÇÃO COMPLETAMENTE.";
     if (imagens_personalizadas && Array.isArray(imagens_personalizadas) && imagens_personalizadas.length > 0) {
       const fotosValidas = imagens_personalizadas.filter(img => img.url && img.url.trim().length > 5);
@@ -32,11 +35,10 @@ export default async function handler(req, res) {
       }
     }
 
-    // PROMPT MASTER COMPLETO INTEGRADO
+    // 4. PROMPT MASTER COMPLETO PARA A IA
     const promptMaster = `
 Você é um Engenheiro de Software Front-end e UX/UI Designer Sênior de nível internacional, especialista em criação de landing pages modernas, responsivas, visualmente sofisticadas e focadas em alta conversão.
 Sua missão é criar o código HTML5 completo de uma landing page de altíssima qualidade, utilizando as informações fornecidas abaixo.
-O resultado deve ser visualmente superior, profissional, moderno, persuasivo e tecnicamente impecável.
 
 REFERÊNCIA DE ESTILO, ESTRUTURA E QUALIDADE:
 Utilize como principal referência o seguinte site: https://pyerry-diniz-nutri-personal.vercel.app/
@@ -118,41 +120,32 @@ Não escreva nenhuma explicação antes ou depois do código.
 Não utilize Markdown nem blocos de código tipo \`\`\`html.
 `;
 
-    // Chamada para a API da Groq (Llama 3.3 70B)
-    const respGroq = await fetch(GROQ_URL, {
+    // 5. Chamada para a API da Gemini
+    const respGemini = await fetch(GEMINI_URL, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${GROQ_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
-        messages: [
-          { role: "system", content: "Você é um compilador de código HTML/Tailwind de nível internacional. Retorne EXCLUSIVAMENTE o código HTML5 puro funcional, sem markdown, sem caixas de código e sem texto explicativo." },
-          { role: "user", content: promptMaster }
-        ],
-        temperature: 0.5,
-        max_tokens: 4096
+        contents: [{ parts: [{ text: promptMaster }] }]
       })
     });
 
-    const dataGroq = await respGroq.json();
+    const dataGemini = await respGemini.json();
 
-    if (dataGroq.error) {
-      console.error("Erro na Groq:", dataGroq.error);
-      return res.status(400).json({ success: false, error: `Erro na Groq: ${dataGroq.error.message}` });
+    if (dataGemini.error) {
+      console.error("Erro no Gemini:", dataGemini.error);
+      return res.status(400).json({ success: false, error: `Erro na IA: ${dataGemini.error.message}` });
     }
 
-    let siteHtml = dataGroq?.choices?.[0]?.message?.content || "";
+    let siteHtml = dataGemini?.candidates?.[0]?.content?.parts?.[0]?.text || "";
 
-    // Limpeza rigorosa de marcações de código da IA
+    // Limpeza de marcações de bloco da IA
     siteHtml = siteHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
 
     if (!siteHtml || siteHtml.length < 100) {
       return res.status(500).json({ success: false, error: 'A IA não retornou um código HTML válido.' });
     }
 
-    // Notificação do Robô no Railway
+    // 6. Notificação do Robô no Railway
     const URL_ROBO = 'https://bot-whatsapp-production-c379.up.railway.app/send-message';
     const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional Premium foi gerado com sucesso pela nossa Inteligência Artificial!\n\nAcesse a plataforma para visualizar a prévia completa em tela cheia.`;
 
