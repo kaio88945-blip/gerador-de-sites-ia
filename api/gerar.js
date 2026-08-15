@@ -22,82 +22,103 @@ export default async function handler(req, res) {
     const GROQ_API_KEY = process.env.GROQ_API_KEY || "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";
     const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-    // Mapeamento e formatação das imagens personalizadas enviadas no briefing
-    let textoImagensPersonalizadas = "";
+    // Trata e valida se o cliente realmente enviou imagens
+    let instrucaoGaleriaImagens = "O CLIENTE NÃO ENVIOU IMAGENS PERSONALIZADAS. NUNCA CRIE UMA GALERIA OU QUADROS DE IMAGEM VAZIOS/SKELETONS NA PÁGINA. IGNORE ESSA SEÇÃO COMPLETAMENTE.";
     if (imagens_personalizadas && Array.isArray(imagens_personalizadas) && imagens_personalizadas.length > 0) {
-      textoImagensPersonalizadas = "IMAGENS ENVIADAS PELO CLIENTE PARA INCLUIR NO SITE:\n" +
-        imagens_personalizadas.map((img, i) => `- Imagem ${i + 1}: URL: "${img.url}" | Descrição/Uso: "${img.descricao}"`).join("\n");
+      const fotosValidas = imagens_personalizadas.filter(img => img.url && img.url.trim().length > 5);
+      if (fotosValidas.length > 0) {
+        instrucaoGaleriaImagens = "O CLIENTE ENVIOU AS SEGUINTES IMAGENS PARA O SITE. CRIE UMA SEÇÃO DE GALERIA/PROTÓTIPO ELEGANTE APENAS SE ELAS EXISTIREM:\n" +
+          fotosValidas.map((img, i) => `- Imagem ${i + 1}: URL: "${img.url}" | Descrição/Uso: "${img.descricao || 'Foto do Projeto'}"`).join("\n");
+      }
     }
 
-    // PROMPT MASTER PROFISSIONAL DE ALTA PRECISÃO
+    // PROMPT MASTER COMPLETO INTEGRADO
     const promptMaster = `
-Você é um Engenheiro de Software Front-end e UX/UI Designer Senior de nível internacional.
-Sua missão é criar o código completo de um site de altíssima conversão em HTML5 puro, sem erros de codificação, sem caracteres corrompidos, com layout 100% centralizado, responsivo e visualmente perfeito.
+Você é um Engenheiro de Software Front-end e UX/UI Designer Sênior de nível internacional, especialista em criação de landing pages modernas, responsivas, visualmente sofisticadas e focadas em alta conversão.
+Sua missão é criar o código HTML5 completo de uma landing page de altíssima qualidade, utilizando as informações fornecidas abaixo.
+O resultado deve ser visualmente superior, profissional, moderno, persuasivo e tecnicamente impecável.
 
-REFERÊNCIA DE ESTILO E QUALIDADE:
-Siga o padrão de elegância em Dark Mode luxuoso do modelo https://pyerry-diniz-nutri-personal.vercel.app/
+REFERÊNCIA DE ESTILO, ESTRUTURA E QUALIDADE:
+Utilize como principal referência o seguinte site: https://pyerry-diniz-nutri-personal.vercel.app/
+Não copie o site literalmente. Utilize-o apenas como referência de estilo, qualidade visual, organização, identidade, experiência do usuário e proposta.
+Crie uma versão muito mais completa, extensa, sofisticada, moderna e visualmente superior.
+O design deve seguir uma estética moderna e sofisticada utilizando Dark Mode luxuoso, efeitos de profundidade, transparências, blur, gradientes sutis, cards modernos, bordas elegantes e elementos visuais que transmitam autoridade e profissionalismo.
 
-REGRAS RÍGIDAS DE TÉCNICA E CSS:
-1. O HTML DEVE iniciar obrigatoriamente com:
-   <!DOCTYPE html>
-   <html lang="pt-BR">
-   <head>
-     <meta charset="UTF-8">
-     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <script src="https://cdn.tailwindcss.com"></script>
-     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-     <link rel="preconnect" href="https://fonts.googleapis.com">
-     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-     <style>
-       * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-       body { background-color: #0b0f17 !important; color: #f8fafc !important; overflow-x: hidden; }
-       .container-custom { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
-       .bg-card { background-color: rgba(17, 24, 39, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
-     </style>
-   </head>
+REGRAS RÍGIDAS DE TÉCNICA E CÓDIGO:
+O código deve ser entregue em HTML5 completo, funcional e sem erros de codificação. Não utilize caracteres corrompidos.
+O HTML DEVE iniciar obrigatoriamente com:
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${nome || 'Landing Page Pro'}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: #0b0f17 !important; color: #f8fafc !important; overflow-x: hidden; }
+    .container-custom { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    .bg-card { background-color: rgba(17, 24, 39, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
+  </style>
+</head>
 
-2. CENTRALIZAÇÃO E LAYOUT:
-   - Todas as seções DEVEM utilizar contêineres centralizados ('container-custom' ou 'max-w-6xl mx-auto px-4').
-   - NENHUM elemento pode ficar descentralizado ou desalinhado.
-   - Grids devem ter espaçamento harmônico (ex: 'grid grid-cols-1 md:grid-cols-3 gap-8').
-
-3. IMAGENS NOS DEPOIMENTOS (OBRIGATÓRIO):
-   - Crie exatamente 3 cards de depoimentos de clientes satisfeitos.
-   - Cada card DEVE ter a foto de perfil do cliente usando ESTAS URLs estáticas do Unsplash:
-     * Cliente 1: <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80" class="w-14 h-14 rounded-full object-cover border-2 border-indigo-500" alt="Foto do Cliente">
-     * Cliente 2: <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80" class="w-14 h-14 rounded-full object-cover border-2 border-indigo-500" alt="Foto do Cliente">
-     * Cliente 3: <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80" class="w-14 h-14 rounded-full object-cover border-2 border-indigo-500" alt="Foto do Cliente">
-   - Inclua estrelas de avaliação amarelas (<i class="fas fa-star text-yellow-400"></i>) em cada depoimento.
-
-DADOS DA EMPRESA E CLIENTE:
+DADOS DA EMPRESA E DO CLIENTE:
 - Nome/Marca: ${nome || 'Kaio - Especialista'}
 - Segmento/Nicho: ${nicho || 'Serviços Profissionais'}
 - Descrição/História: ${descricao || 'Ajudando clientes a alcançarem resultados com estratégias de alto impacto.'}
 - Slogan: ${dados.slogan || ''}
-- Público Alvo: ${dados.publico_alvo || ''}
+- Público-alvo: ${dados.publico_alvo || ''}
 - Diferenciais: ${dados.diferenciais || ''}
-- Cor de Destaque (Botões/Acentos): ${dados.cor_primaria || '#6366f1'}
+- Cor de destaque (Botões/Links/Destaques): ${dados.cor_primaria || '#6366f1'}
 - Botão CTA: "${dados.cta_texto || 'Falar no WhatsApp'}"
 - WhatsApp do Botão: ${numeroLimpo}
 
-${textoImagensPersonalizadas}
+INSTRUÇÃO DE IMAGENS PERSONALIZADAS:
+${instrucaoGaleriaImagens}
 
-ESTRUTURA DE SEÇÕES DA LANDING PAGE:
-1. Header Fixo com efeito Blur, logo/nome, links do menu e botão destacado para o WhatsApp.
-2. Hero Section com Headline chamativa gigante centralizada, subtítulo explicativo, badges e botão CTA.
-3. Seção de Estatísticas (3 a 4 números de autoridade centralizados, ex: +500 Clientes, 99% Satisfação).
-4. Seção "Sobre Nós / Apresentação" com argumentos de vendas completos e imagem representativa.
-5. Seção de "Serviços e Soluções" em Grid de Cards com ícones do FontAwesome e efeitos de hover.
-6. Seção com as Imagens Personalizadas enviadas pelo cliente (se houver no briefing) organizadas em uma galeria/grid elegante com suas respectivas descrições.
-7. Seção de Depoimentos (3 cards com fotos de perfil do Unsplash fornecidas e estrelas).
-8. Seção de Perguntas Frequentes (FAQ) com 6 perguntas essenciais sanfonadas/organizadas.
-9. Seção de Chamada Final para Ação (CTA) em destaque para o WhatsApp.
-10. Rodapé completo centralizado.
+DEPOIMENTOS — OBRIGATÓRIO:
+Crie exatamente 3 cards de depoimentos de clientes satisfeitos. Cada depoimento deve parecer natural e realista.
+Utilize obrigatoriamente estas imagens estáticas nos <img> dos depoimentos:
+- Cliente 1: https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80
+- Cliente 2: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80
+- Cliente 3: https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80
+Cada card deve conter foto com borda, nome, pequena identificação, depoimento e avaliação com 5 estrelas amarelas (<i class="fas fa-star text-yellow-400"></i>).
 
-IMPORTANTE: Retorne EXCLUSIVAMENTE o código HTML5 completo do início ao fim. Não escreva textos antes ou depois. Não utilize marcações markdown tipo \`\`\`html.
+FAQ — OBRIGATÓRIO:
+Crie uma seção com EXATAMENTE 8 perguntas frequentes relevantes com sistema de acordeão interativo em JavaScript (abrir e fechar suavemente com ícone + / - ou seta).
+
+ANIMAÇÕES:
+- Inclua animações AOS ('data-aos="fade-up"') em seções, headlines, botões, cards e depoimentos.
+- No final da página (antes do </body>), inclua a inicialização da biblioteca AOS:
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+  <script>AOS.init({ duration: 800, once: true });</script>
+
+ESTRUTURA COMPLETA DA LANDING PAGE:
+1. HEADER FIXO com efeito Blur, logo/nome, links de navegação e botão CTA destacado para o WhatsApp. Menu hambúrguer funcional para mobile.
+2. HERO SECTION impactante com Headline gigante, subhead persuasivo, badges de autoridade e botão principal estilo CTA.
+3. SEÇÃO DE AUTORIDADE E ESTATÍSTICAS com 3 ou 4 contadores de números (Ex: +500 Clientes Atendidos, 99% Satisfação, +5 Anos).
+4. SEÇÃO SOBRE A EMPRESA / PROFISSIONAL com história, missão e diferenciais bem estruturados.
+5. SEÇÃO DE SERVIÇOS E SOLUÇÕES em Grid de Cards modernos com ícones FontAwesome e hover.
+6. SEÇÃO BENEFÍCIOS E DIFERENCIAIS com checkmarks e destaques.
+7. SEÇÃO "COMO FUNCIONA" com passo a passo numerado (3 a 5 etapas).
+8. GALERIA DE IMAGENS PERSONALIZADAS (SOMENTE se houver imagens fornecidas no briefing. Caso contrário, NÃO CRIE essa seção nem quadros vazios).
+9. SEÇÃO DE DEPOIMENTOS (Exatamente 3 cards com as fotos Unsplash e 5 estrelas).
+10. SEÇÃO FAQ (Exatamente 8 perguntas sanfonadas interativas).
+11. CTA FINAL persuasivo direcionando para o WhatsApp.
+12. FOOTER completo e centralizado.
+
+FORMATO OBRIGATÓRIO DA RESPOSTA:
+Retorne EXCLUSIVAMENTE o código HTML5 completo do <!DOCTYPE html> até </html>.
+Não escreva nenhuma explicação antes ou depois do código.
+Não utilize Markdown nem blocos de código tipo \`\`\`html.
 `;
 
+    // Chamada para a API da Groq (Llama 3.3 70B)
     const respGroq = await fetch(GROQ_URL, {
       method: 'POST',
       headers: {
@@ -107,7 +128,7 @@ IMPORTANTE: Retorne EXCLUSIVAMENTE o código HTML5 completo do início ao fim. N
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         messages: [
-          { role: "system", content: "Você é um compilador de código HTML/Tailwind de nível profissional. Retorne apenas HTML válido em UTF-8 com layout centralizado em Dark Mode sem markdown." },
+          { role: "system", content: "Você é um compilador de código HTML/Tailwind de nível internacional. Retorne EXCLUSIVAMENTE o código HTML5 puro funcional, sem markdown, sem caixas de código e sem texto explicativo." },
           { role: "user", content: promptMaster }
         ],
         temperature: 0.5,
@@ -124,6 +145,7 @@ IMPORTANTE: Retorne EXCLUSIVAMENTE o código HTML5 completo do início ao fim. N
 
     let siteHtml = dataGroq?.choices?.[0]?.message?.content || "";
 
+    // Limpeza rigorosa de marcações de código da IA
     siteHtml = siteHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
 
     if (!siteHtml || siteHtml.length < 100) {
@@ -132,7 +154,7 @@ IMPORTANTE: Retorne EXCLUSIVAMENTE o código HTML5 completo do início ao fim. N
 
     // Notificação do Robô no Railway
     const URL_ROBO = 'https://bot-whatsapp-production-c379.up.railway.app/send-message';
-    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional em Dark Mode foi gerado com sucesso pela nossa IA!\n\nAcesse a plataforma para visualizar a prévia completa em tela cheia.`;
+    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional Premium foi gerado com sucesso pela nossa Inteligência Artificial!\n\nAcesse a plataforma para visualizar a prévia completa em tela cheia.`;
 
     try {
       await fetch(URL_ROBO, {
