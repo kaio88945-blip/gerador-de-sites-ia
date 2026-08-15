@@ -1,0 +1,21 @@
+{
+  "name": "Gerador de Sites IA",
+  "short_name": "SiteIA",
+  "description": "Crie seu site profissional com IA em poucos minutos.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#6366f1",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2583/2583208.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/2583/2583208.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
