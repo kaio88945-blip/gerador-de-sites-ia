@@ -10,6 +10,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="SiteIA">
   
+  <!-- Fonte Inter Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -170,6 +171,45 @@
       cursor: pointer;
     }
 
+    .dynamic-item {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .btn-add {
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      border: 1px dashed var(--primary);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 5px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-add:hover {
+      background: rgba(99, 102, 241, 0.3);
+      color: #fff;
+    }
+
+    .btn-remove {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid var(--danger);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      float: right;
+    }
+
     .btn-submit {
       width: 100%;
       background: linear-gradient(135deg, var(--primary), var(--primary-hover));
@@ -189,6 +229,30 @@
       box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
     }
 
+    .btn-open-newtab {
+      width: 100%;
+      background: linear-gradient(135deg, var(--accent), #16a34a);
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-open-newtab:hover {
+      filter: brightness(1.1);
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
+    }
+
     #loading-screen { display: none; text-align: center; padding: 40px 0; }
     .spinner {
       width: 65px; height: 65px;
@@ -202,10 +266,10 @@
 
     #result-screen { display: none; text-align: center; }
     .site-preview-frame {
-      width: 100%; height: 500px;
+      width: 100%; height: 550px;
       border: 1px solid var(--border);
       border-radius: 12px;
-      margin-top: 20px;
+      margin-top: 10px;
       background: #fff;
     }
   </style>
@@ -218,7 +282,7 @@
     <form id="site-form">
       <div class="header">
         <h1>Criador de Sites IA</h1>
-        <p>Preencha os dados da sua empresa. A Inteligência Artificial vai gerar o seu site completo e disparar o aviso no WhatsApp!</p>
+        <p>Monte o briefing perfeito para o seu site. Conforme você seleciona as opções, os campos de detalhes aparecem automaticamente!</p>
       </div>
 
       <!-- SEÇÃO 1: Dados Principais da Empresa -->
@@ -252,11 +316,22 @@
 
         <div class="input-group">
           <label>Descrição e História da Empresa *</label>
-          <textarea id="descricao" rows="3" placeholder="Explique o que sua empresa faz, diferenciais e serviços..." required></textarea>
+          <textarea id="descricao" rows="3" placeholder="Explique o que sua empresa faz, tempo de mercado e diferenciais..." required></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label>Público-Alvo</label>
+            <input type="text" id="publico_alvo" placeholder="Ex: Homens de 20 a 45 anos da região central">
+          </div>
+          <div class="input-group">
+            <label>Principais Diferenciais</label>
+            <input type="text" id="diferenciais" placeholder="Ex: Atendimento com hora marcada, Bebida grátis">
+          </div>
         </div>
       </div>
 
-      <!-- SEÇÃO 2: Visual e Cores -->
+      <!-- SEÇÃO 2: Visual, Cores e Mídias -->
       <div class="form-section">
         <div class="section-title">🎨 Visual e Identidade da Marca</div>
 
@@ -267,7 +342,7 @@
               <option value="Moderno e Escuro (Dark Mode)">Moderno e Escuro (Dark)</option>
               <option value="Clean e Claro">Clean e Claro (Minimalista)</option>
               <option value="Colorido e Vibrante">Colorido e Vibrante</option>
-              <option value="Elegante e Luxuoso">Elegante e Luxuoso</option>
+              <option value="Elegante e Luxuoso">Elegante e Luxuoso (Dourado/Preto)</option>
             </select>
           </div>
 
@@ -276,15 +351,230 @@
             <input type="color" id="cor_primaria" value="#6366f1" style="height: 45px; cursor: pointer;">
           </div>
         </div>
+
+        <div class="checkbox-card" onclick="toggleBox('box-cor-secundaria')">
+          <input type="checkbox" id="check_cor_secundaria">
+          <span>Desejo escolher uma Cor Secundária</span>
+        </div>
+
+        <div id="box-cor-secundaria" class="conditional-box">
+          <div class="input-group">
+            <label>Cor Secundária</label>
+            <input type="color" id="cor_secundaria" value="#22c55e" style="height: 45px; cursor: pointer;">
+          </div>
+        </div>
+
+        <div class="checkbox-grid" style="margin-top: 12px;">
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_logo" onchange="toggleBox('box-logo', this.checked)">
+            <span>Tenho uma Logo</span>
+          </label>
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_imagens" onchange="toggleBox('box-imagens', this.checked)">
+            <span>Tenho Imagens Próprias</span>
+          </label>
+        </div>
+
+        <div id="box-logo" class="conditional-box">
+          <div class="input-group">
+            <label>Link da Sua Logo (Google Drive/Dropbox/Imgur)</label>
+            <input type="url" id="link_logo" placeholder="https://...">
+          </div>
+        </div>
+
+        <div id="box-imagens" class="conditional-box">
+          <div class="input-group">
+            <label>Link da Pasta com Imagens Próprias</label>
+            <input type="url" id="link_imagens" placeholder="https://drive.google.com/...">
+          </div>
+        </div>
       </div>
 
-      <!-- SEÇÃO 3: Contatos -->
+      <!-- SEÇÃO 3: Estrutura do Site e Seções -->
       <div class="form-section">
-        <div class="section-title">📲 Contato para Notificação no WhatsApp</div>
+        <div class="section-title">🧩 Seções e Conteúdos do Site</div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Marque quais seções deseja exibir. Onde necessário, os campos de detalhes aparecerão para você preencher:</p>
+
+        <div class="checkbox-grid">
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_servicos" onchange="toggleBox('box-servicos', this.checked)">
+            <span>Serviços</span>
+          </label>
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_produtos" onchange="toggleBox('box-produtos', this.checked)">
+            <span>Produtos</span>
+          </label>
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_oferta" onchange="toggleBox('box-oferta', this.checked)">
+            <span>Oferta / Promoção</span>
+          </label>
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_depoimentos" onchange="toggleBox('box-depoimentos', this.checked)">
+            <span>Depoimentos</span>
+          </label>
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_faq" onchange="toggleBox('box-faq', this.checked)">
+            <span>Perguntas Frequentes (FAQ)</span>
+          </label>
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_galeria" onchange="toggleBox('box-galeria', this.checked)">
+            <span>Galeria / Portfólio</span>
+          </label>
+        </div>
+
+        <div id="box-servicos" class="conditional-box">
+          <label>Adicionar Serviços:</label>
+          <div id="lista-servicos">
+            <div class="dynamic-item">
+              <input type="text" class="servico-nome" placeholder="Nome do Serviço" style="margin-bottom: 8px;">
+              <input type="text" class="servico-desc" placeholder="Breve Descrição e Valor (Ex: R$ 50)">
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addDynamicItem('lista-servicos', 'servico')">+ Adicionar Outro Serviço</button>
+        </div>
+
+        <div id="box-produtos" class="conditional-box">
+          <label>Adicionar Produtos:</label>
+          <div id="lista-produtos">
+            <div class="dynamic-item">
+              <input type="text" class="produto-nome" placeholder="Nome do Produto" style="margin-bottom: 8px;">
+              <input type="text" class="produto-preco" placeholder="Preço (Ex: R$ 99,90)">
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addDynamicItem('lista-produtos', 'produto')">+ Adicionar Outro Produto</button>
+        </div>
+
+        <div id="box-oferta" class="conditional-box">
+          <div class="input-group">
+            <label>Título da Oferta Especial *</label>
+            <input type="text" id="oferta_titulo" placeholder="Ex: Promoção de Inauguração - 30% OFF">
+          </div>
+          <div class="input-group">
+            <label>Descrição da Oferta</label>
+            <textarea id="oferta_desc" rows="2" placeholder="Detalhes do desconto ou pacote exclusivo..."></textarea>
+          </div>
+          <div class="grid-2">
+            <div class="input-group">
+              <label>Preço Normal</label>
+              <input type="text" id="oferta_preco_de" placeholder="Ex: R$ 150,00">
+            </div>
+            <div class="input-group">
+              <label>Preço Promocional</label>
+              <input type="text" id="oferta_preco_por" placeholder="Ex: R$ 99,00">
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Texto de Urgência (Gatilho)</label>
+            <input type="text" id="oferta_urgencia" placeholder="Ex: Válido somente para os primeiros 10 clientes!">
+          </div>
+        </div>
+
+        <div id="box-depoimentos" class="conditional-box">
+          <label>Adicionar Depoimentos de Clientes:</label>
+          <div id="lista-depoimentos">
+            <div class="dynamic-item">
+              <input type="text" class="depoimento-autor" placeholder="Nome do Cliente" style="margin-bottom: 8px;">
+              <textarea class="depoimento-texto" rows="2" placeholder="O que o cliente falou sobre sua empresa..."></textarea>
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addDynamicItem('lista-depoimentos', 'depoimento')">+ Adicionar Outro Depoimento</button>
+        </div>
+
+        <div id="box-faq" class="conditional-box">
+          <label>Perguntas Frequentes:</label>
+          <div id="lista-faq">
+            <div class="dynamic-item">
+              <input type="text" class="faq-pergunta" placeholder="Pergunta (Ex: Qual o horário de atendimento?)" style="margin-bottom: 8px;">
+              <input type="text" class="faq-resposta" placeholder="Resposta curta">
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addDynamicItem('lista-faq', 'faq')">+ Adicionar Outra Pergunta</button>
+        </div>
+
+        <div id="box-galeria" class="conditional-box">
+          <div class="input-group">
+            <label>Link da Galeria de Fotos / Portfólio (Google Drive / Instagram)</label>
+            <input type="url" id="link_galeria" placeholder="https://...">
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO 4: Botão de Chamada para Ação (CTA) -->
+      <div class="form-section">
+        <div class="section-title">🎯 Botão Principal de Ação (CTA)</div>
+
+        <label class="checkbox-card" style="margin-bottom: 12px;">
+          <input type="checkbox" id="check_cta" onchange="toggleBox('box-cta', this.checked)" checked>
+          <span>Desejo personalizar o Botão Principal do site</span>
+        </label>
+
+        <div id="box-cta" class="conditional-box active">
+          <div class="input-group">
+            <label>O que você deseja escrito no botão? *</label>
+            <input type="text" id="cta_texto" value="Agendar no WhatsApp" placeholder="Ex: Comprar Agora, Solicitar Orçamento">
+          </div>
+
+          <div class="input-group">
+            <label>Para onde este botão deve levar o visitante? *</label>
+            <select id="cta_destino" onchange="alterarDestinoCTA(this.value)">
+              <option value="whatsapp">WhatsApp</option>
+              <option value="instagram">Instagram</option>
+              <option value="telefone">Ligação de Telefone</option>
+              <option value="email">Enviar E-mail</option>
+              <option value="link">Link Externo / Página Especifica</option>
+            </select>
+          </div>
+
+          <div id="box-cta-detalhe" class="input-group">
+            <label id="lbl-cta-detalhe">Mensagem Automática Inicial do WhatsApp (Opcional)</label>
+            <input type="text" id="cta_detalhe" placeholder="Ex: Olá, vim pelo site e gostaria de um orçamento!">
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO 5: Contatos e Redes Sociais -->
+      <div class="form-section">
+        <div class="section-title">📲 Contato para Notificação & Redes Sociais</div>
 
         <div class="input-group">
-          <label>Seu WhatsApp com DDD (Para receber o aviso) *</label>
+          <label>Seu WhatsApp com DDD (Para receber o aviso do Robô) *</label>
           <input type="tel" id="whatsapp" placeholder="Ex: 43984620902" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label>E-mail da Empresa</label>
+            <input type="email" id="email" placeholder="contato@empresa.com">
+          </div>
+          <div class="input-group">
+            <label>Endereço Físico (Caso queira exibir no site)</label>
+            <input type="text" id="endereco" placeholder="Ex: Av. Paulista, 1000 - SP">
+          </div>
+        </div>
+
+        <label style="margin-top: 10px; display: block;">Redes Sociais a Exibir:</label>
+        <div class="checkbox-grid" style="margin-top: 8px;">
+          <label class="checkbox-card"><input type="checkbox" onchange="toggleRedeSocial('box-redes-instagram', this.checked)"> Instagram</label>
+          <label class="checkbox-card"><input type="checkbox" onchange="toggleRedeSocial('box-redes-facebook', this.checked)"> Facebook</label>
+          <label class="checkbox-card"><input type="checkbox" onchange="toggleRedeSocial('box-redes-tiktok', this.checked)"> TikTok</label>
+          <label class="checkbox-card"><input type="checkbox" onchange="toggleRedeSocial('box-redes-youtube', this.checked)"> YouTube</label>
+          <label class="checkbox-card"><input type="checkbox" onchange="toggleRedeSocial('box-redes-linkedin', this.checked)"> LinkedIn</label>
+        </div>
+
+        <div id="box-redes-instagram" class="conditional-box">
+          <input type="text" id="rede_instagram" placeholder="Link do Instagram (Ex: instagram.com/suamarca)">
+        </div>
+        <div id="box-redes-facebook" class="conditional-box">
+          <input type="text" id="rede_facebook" placeholder="Link do Facebook">
+        </div>
+        <div id="box-redes-tiktok" class="conditional-box">
+          <input type="text" id="rede_tiktok" placeholder="Link do TikTok">
+        </div>
+        <div id="box-redes-youtube" class="conditional-box">
+          <input type="text" id="rede_youtube" placeholder="Link do canal do YouTube">
+        </div>
+        <div id="box-redes-linkedin" class="conditional-box">
+          <input type="text" id="rede_linkedin" placeholder="Link do perfil do LinkedIn">
         </div>
       </div>
 
@@ -305,18 +595,93 @@
     <!-- TELA DO SITE GERADO -->
     <div id="result-screen">
       <h2>🎉 Seu Site Foi Gerado com IA!</h2>
-      <p style="color: var(--text-muted); margin-bottom: 10px;">Abaixo está a prévia do seu site. A notificação foi enviada para o seu WhatsApp!</p>
+      <p style="color: var(--text-muted); margin-bottom: 15px;">Abaixo está a prévia do seu site. Você pode abrir em tela cheia para usar e compartilhar!</p>
+      
+      <button type="button" class="btn-open-newtab" id="btn-abrir-nova-aba">
+        🔗 Abrir Site em Nova Aba (Tela Cheia)
+      </button>
+
       <iframe class="site-preview-frame" id="site-preview"></iframe>
     </div>
 
   </div>
 
   <script>
+    // 1. EXIBIR/OCULTAR CAIXAS CONDICIONAIS
+    function toggleBox(id, status) {
+      const box = document.getElementById(id);
+      if (!box) return;
+      if (status === undefined) {
+        box.classList.toggle('active');
+      } else if (status) {
+        box.classList.add('active');
+      } else {
+        box.classList.remove('active');
+      }
+    }
+
+    function toggleRedeSocial(id, status) {
+      toggleBox(id, status);
+    }
+
+    // 2. DESTINO DINÂMICO DO CTA
+    function alterarDestinoCTA(tipo) {
+      const lbl = document.getElementById('lbl-cta-detalhe');
+      const input = document.getElementById('cta_detalhe');
+
+      if (tipo === 'whatsapp') {
+        lbl.innerText = "Mensagem Automática Inicial do WhatsApp (Opcional)";
+        input.placeholder = "Ex: Olá, vim pelo site e gostaria de um orçamento!";
+      } else if (tipo === 'instagram') {
+        lbl.innerText = "Link do Seu Perfil do Instagram";
+        input.placeholder = "https://instagram.com/seu_perfil";
+      } else if (tipo === 'telefone') {
+        lbl.innerText = "Número do Telefone com DDD para Ligação Direta";
+        input.placeholder = "Ex: 43984620902";
+      } else if (tipo === 'email') {
+        lbl.innerText = "Endereço de E-mail de Destino";
+        input.placeholder = "contato@empresa.com";
+      } else {
+        lbl.innerText = "Link de Destino Completo";
+        input.placeholder = "https://suapagina.com.br";
+      }
+    }
+
+    // 3. ADICIONAR ITENS DINÂMICOS
+    function addDynamicItem(containerId, tipo) {
+      const container = document.getElementById(containerId);
+      const div = document.createElement('div');
+      div.className = 'dynamic-item';
+
+      let html = '<button type="button" class="btn-remove" onclick="this.parentElement.remove()">Remover</button>';
+
+      if (tipo === 'servico') {
+        html += '<input type="text" class="servico-nome" placeholder="Nome do Serviço" style="margin-bottom: 8px;">';
+        html += '<input type="text" class="servico-desc" placeholder="Breve Descrição e Valor">';
+      } else if (tipo === 'produto') {
+        html += '<input type="text" class="produto-nome" placeholder="Nome do Produto" style="margin-bottom: 8px;">';
+        html += '<input type="text" class="produto-preco" placeholder="Preço (Ex: R$ 99,90)">';
+      } else if (tipo === 'depoimento') {
+        html += '<input type="text" class="depoimento-autor" placeholder="Nome do Cliente" style="margin-bottom: 8px;">';
+        html += '<textarea class="depoimento-texto" rows="2" placeholder="Depoimento do cliente..."></textarea>';
+      } else if (tipo === 'faq') {
+        html += '<input type="text" class="faq-pergunta" placeholder="Pergunta" style="margin-bottom: 8px;">';
+        html += '<input type="text" class="faq-resposta" placeholder="Resposta curta">';
+      }
+
+      div.innerHTML = html;
+      container.appendChild(div);
+    }
+
+    // 4. SUBMISSÃO DO FORMULÁRIO E RESPOSTA DA IA
+    let htmlGeradoPelaIA = "";
+
     const form = document.getElementById('site-form');
     const loadingScreen = document.getElementById('loading-screen');
     const resultScreen = document.getElementById('result-screen');
     const sitePreview = document.getElementById('site-preview');
     const statusText = document.getElementById('status-text');
+    const btnAbrirNovaAba = document.getElementById('btn-abrir-nova-aba');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -326,18 +691,22 @@
         nicho: document.getElementById('nicho').value,
         slogan: document.getElementById('slogan').value,
         descricao: document.getElementById('descricao').value,
+        publico_alvo: document.getElementById('publico_alvo').value,
+        diferenciais: document.getElementById('diferenciais').value,
         estilo: document.getElementById('estilo').value,
         cor_primaria: document.getElementById('cor_primaria').value,
+        cor_secundaria: document.getElementById('cor_secundaria').value,
+        cta_texto: document.getElementById('cta_texto').value,
         whatsapp: document.getElementById('whatsapp').value
       };
 
       form.style.display = 'none';
       loadingScreen.style.display = 'block';
 
-      // Mensagens dinâmicas enquanto a IA trabalha
-      setTimeout(() => { statusText.innerText = "🎨 Aplicando paleta de cores, botões e ícones..."; }, 5000);
-      setTimeout(() => { statusText.innerText = "✍️ Escrevendo seções de serviços, depoimentos e contatos..."; }, 12000);
-      setTimeout(() => { statusText.innerText = "📲 Disparando a notificação para o seu WhatsApp..."; }, 20000);
+      // Mensagens de progresso durante a geração da IA
+      setTimeout(() => { statusText.innerText = "🎨 Criando estrutura visual com Tailwind CSS e fontes..."; }, 4000);
+      setTimeout(() => { statusText.innerText = "✍️ Escrevendo cópias de vendas, depoimentos e seção sobre a empresa..."; }, 9000);
+      setTimeout(() => { statusText.innerText = "📲 Finalizando o código e avisando no seu WhatsApp..."; }, 15000);
 
       try {
         const response = await fetch('/api/gerar', {
@@ -352,16 +721,28 @@
         resultScreen.style.display = 'block';
 
         if (data.success && data.html) {
+          htmlGeradoPelaIA = data.html;
           sitePreview.srcdoc = data.html;
         } else {
-          sitePreview.srcdoc = `<h1>Erro ao gerar site</h1><p>${data.error || 'Tente novamente.'}</p>`;
+          sitePreview.srcdoc = `<h1>Ocorreu um erro ao gerar o site</h1><p>${data.error || 'Tente novamente.'}</p>`;
         }
 
       } catch (err) {
-        console.error("Erro na requisição:", err);
+        console.error("Erro no envio:", err);
         loadingScreen.style.display = 'none';
         resultScreen.style.display = 'block';
-        sitePreview.srcdoc = "<h1>Ocorreu um erro ao conectar com a IA. Tente novamente em alguns segundos.</h1>";
+        sitePreview.srcdoc = "<h1>Erro na conexão com a API de IA. Tente novamente em instantes.</h1>";
+      }
+    });
+
+    // Ação para abrir o site gerado em tela cheia fora do iframe
+    btnAbrirNovaAba.addEventListener('click', () => {
+      if (htmlGeradoPelaIA) {
+        const novaAba = window.open();
+        novaAba.document.write(htmlGeradoPelaIA);
+        novaAba.document.close();
+      } else {
+        alert("Nenhum site foi gerado ainda para ser aberto!");
       }
     });
 
