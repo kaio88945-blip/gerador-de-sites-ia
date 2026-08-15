@@ -1,4 +1,669 @@
-form.addEventListener('submit', async (e) => {
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CreateSite AI - Gerador Automático de Sites</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#6366f1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="SiteIA">
+  
+  <!-- Fonte Inter Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --accent: #22c55e;
+      --danger: #ef4444;
+      --bg-dark: #0f172a;
+      --card-bg: rgba(30, 41, 59, 0.85);
+      --input-bg: rgba(15, 23, 42, 0.7);
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.12);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+
+    body {
+      background: radial-gradient(circle at top left, #1e1b4b, #0f172a);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px 15px 90px 15px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 780px;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 35px 25px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+      animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .header { text-align: center; margin-bottom: 30px; }
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+    .header p { color: var(--text-muted); font-size: 0.95rem; }
+
+    .form-section {
+      margin-bottom: 25px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 22px;
+    }
+    .form-section:last-of-type { border-bottom: none; }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #e2e8f0;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    @media (max-width: 580px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .input-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    input, textarea, select {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      transition: all 0.25s ease;
+      outline: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    /* Animação dos Campos Condicionais */
+    .conditional-box {
+      display: none;
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--primary);
+      border-radius: 12px;
+      padding: 18px;
+      margin-top: 10px;
+      margin-bottom: 15px;
+      animation: slideDown 0.35s ease-out forwards;
+    }
+
+    .conditional-box.active { display: block; }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Estilo para Checkboxes */
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .checkbox-card {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+
+    .checkbox-card:hover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+
+    .checkbox-card input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary);
+      cursor: pointer;
+    }
+
+    /* Item Dinâmico Adicionável */
+    .dynamic-item {
+      background: rgba(30, 41, 59, 0.6);
+      border: 1px dashed var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .btn-add {
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      border: 1px dashed var(--primary);
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 5px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-add:hover {
+      background: rgba(99, 102, 241, 0.3);
+      color: #fff;
+    }
+
+    .btn-remove {
+      background: rgba(239, 68, 68, 0.2);
+      color: #f87171;
+      border: 1px solid var(--danger);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      float: right;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+    }
+
+    /* Telas de Status e Resultado */
+    #loading-screen { display: none; text-align: center; padding: 30px 0; }
+    .spinner {
+      width: 60px; height: 60px;
+      border: 5px solid rgba(255, 255, 255, 0.1);
+      border-left-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #result-screen { display: none; text-align: center; }
+    .site-preview-frame {
+      width: 100%; height: 420px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      margin-top: 20px;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- FORMULÁRIO PRINCIPAL - BRIEFING INTERATIVO -->
+    <form id="site-form">
+      <div class="header">
+        <h1>Criador de Sites IA</h1>
+        <p>Monte o briefing perfeito para o seu site. Conforme você seleciona as opções, os campos de detalhes aparecem automaticamente!</p>
+      </div>
+
+      <!-- SEÇÃO 1: Dados Principais da Empresa -->
+      <div class="form-section">
+        <div class="section-title">🏢 Identidade e Empresa</div>
+        
+        <div class="grid-2">
+          <div class="input-group">
+            <label>Nome da Empresa / Marca *</label>
+            <input type="text" id="nome" placeholder="Ex: Barber Shop Silva" required>
+          </div>
+          
+          <div class="input-group">
+            <label>Segmento / Área de Atuação *</label>
+            <select id="nicho" required>
+              <option value="" disabled selected>Selecione uma opção</option>
+              <option value="Restaurante / Alimentação">Restaurante / Alimentação</option>
+              <option value="Beleza e Estética">Beleza e Estética</option>
+              <option value="Saúde e Bem-estar">Saúde e Bem-estar</option>
+              <option value="Serviços Prestados">Serviços Prestados / Freelancer</option>
+              <option value="Loja Virtual / E-commerce">Loja Virtual / E-commerce</option>
+              <option value="Outro">Outro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label>Slogan ou Frase de Impacto</label>
+          <input type="text" id="slogan" placeholder="Ex: O melhor corte da cidade com estilo único">
+        </div>
+
+        <div class="input-group">
+          <label>Descrição e História da Empresa *</label>
+          <textarea id="descricao" rows="3" placeholder="Explique o que sua empresa faz, tempo de mercado e diferenciais..." required></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label>Público-Alvo</label>
+            <input type="text" id="publico_alvo" placeholder="Ex: Homens de 20 a 45 anos da região central">
+          </div>
+          <div class="input-group">
+            <label>Principais Diferenciais</label>
+            <input type="text" id="diferenciais" placeholder="Ex: Atendimento com hora marcada, Bebida grátis">
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO 2: Visual, Cores e Mídias -->
+      <div class="form-section">
+        <div class="section-title">🎨 Visual e Identidade da Marca</div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label>Estilo Visual Desejado</label>
+            <select id="estilo">
+              <option value="Moderno e Escuro (Dark Mode)">Moderno e Escuro (Dark)</option>
+              <option value="Clean e Claro">Clean e Claro (Minimalista)</option>
+              <option value="Colorido e Vibrante">Colorido e Vibrante</option>
+              <option value="Elegante e Luxuoso">Elegante e Luxuoso (Dourado/Preto)</option>
+            </select>
+          </div>
+
+          <div class="input-group">
+            <label>Cor Principal</label>
+            <input type="color" id="cor_primaria" value="#6366f1" style="height: 45px; cursor: pointer;">
+          </div>
+        </div>
+
+        <!-- Opção para Cor Secundária -->
+        <div class="checkbox-card" onclick="toggleBox('box-cor-secundaria')">
+          <input type="checkbox" id="check_cor_secundaria">
+          <span>Desejo escolher uma Cor Secundária</span>
+        </div>
+
+        <div id="box-cor-secundaria" class="conditional-box">
+          <div class="input-group">
+            <label>Cor Secundária</label>
+            <input type="color" id="cor_secundaria" value="#22c55e" style="height: 45px; cursor: pointer;">
+          </div>
+        </div>
+
+        <!-- Logo e Imagens -->
+        <div class="checkbox-grid" style="margin-top: 12px;">
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_logo" onchange="toggleBox('box-logo', this.checked)">
+            <span>Tenho uma Logo</span>
+          </label>
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_imagens" onchange="toggleBox('box-imagens', this.checked)">
+            <span>Tenho Imagens Próprias</span>
+          </label>
+        </div>
+
+        <div id="box-logo" class="conditional-box">
+          <div class="input-group">
+            <label>Link da Sua Logo (Google Drive/Dropbox/Imgur)</label>
+            <input type="url" id="link_logo" placeholder="https://...">
+          </div>
+        </div>
+
+        <div id="box-imagens" class="conditional-box">
+          <div class="input-group">
+            <label>Link da Pasta com Imagens Próprias</label>
+            <input type="url" id="link_imagens" placeholder="https://drive.google.com/...">
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO 3: Estrutura do Site e Seções -->
+      <div class="form-section">
+        <div class="section-title">🧩 Seções e Conteúdos do Site</div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Marque quais seções deseja exibir. Onde necessário, os campos de detalhes aparecerão para você preencher:</p>
+
+        <div class="checkbox-grid">
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_servicos" onchange="toggleBox('box-servicos', this.checked)">
+            <span>Serviços</span>
+          </label>
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_produtos" onchange="toggleBox('box-produtos', this.checked)">
+            <span>Produtos</span>
+          </label>
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_oferta" onchange="toggleBox('box-oferta', this.checked)">
+            <span>Oferta / Promoção</span>
+          </label>
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_depoimentos" onchange="toggleBox('box-depoimentos', this.checked)">
+            <span>Depoimentos</span>
+          </label>
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_faq" onchange="toggleBox('box-faq', this.checked)">
+            <span>Perguntas Frequentes (FAQ)</span>
+          </label>
+          <label class="checkbox-card">
+            <input type="checkbox" id="check_galeria" onchange="toggleBox('box-galeria', this.checked)">
+            <span>Galeria / Portfólio</span>
+          </label>
+        </div>
+
+        <!-- CONDICIONAL: SERVIÇOS -->
+        <div id="box-servicos" class="conditional-box">
+          <label>Adicionar Serviços:</label>
+          <div id="lista-servicos">
+            <div class="dynamic-item">
+              <input type="text" class="servico-nome" placeholder="Nome do Serviço" style="margin-bottom: 8px;">
+              <input type="text" class="servico-desc" placeholder="Breve Descrição e Valor (Ex: R$ 50)">
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addDynamicItem('lista-servicos', 'servico')">+ Adicionar Outro Serviço</button>
+        </div>
+
+        <!-- CONDICIONAL: PRODUTOS -->
+        <div id="box-produtos" class="conditional-box">
+          <label>Adicionar Produtos:</label>
+          <div id="lista-produtos">
+            <div class="dynamic-item">
+              <input type="text" class="produto-nome" placeholder="Nome do Produto" style="margin-bottom: 8px;">
+              <input type="text" class="produto-preco" placeholder="Preço (Ex: R$ 99,90)">
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addDynamicItem('lista-produtos', 'produto')">+ Adicionar Outro Produto</button>
+        </div>
+
+        <!-- CONDICIONAL: OFERTA PRINCIPAL -->
+        <div id="box-oferta" class="conditional-box">
+          <div class="input-group">
+            <label>Título da Oferta Especial *</label>
+            <input type="text" id="oferta_titulo" placeholder="Ex: Promoção de Inauguração - 30% OFF">
+          </div>
+          <div class="input-group">
+            <label>Descrição da Oferta</label>
+            <textarea id="oferta_desc" rows="2" placeholder="Detalhes do desconto ou pacote exclusivo..."></textarea>
+          </div>
+          <div class="grid-2">
+            <div class="input-group">
+              <label>Preço Normal</label>
+              <input type="text" id="oferta_preco_de" placeholder="Ex: R$ 150,00">
+            </div>
+            <div class="input-group">
+              <label>Preço Promocional</label>
+              <input type="text" id="oferta_preco_por" placeholder="Ex: R$ 99,00">
+            </div>
+          </div>
+          <div class="input-group">
+            <label>Texto de Urgência (Gatilho)</label>
+            <input type="text" id="oferta_urgencia" placeholder="Ex: Válido somente para os primeiros 10 clientes!">
+          </div>
+        </div>
+
+        <!-- CONDICIONAL: DEPOIMENTOS -->
+        <div id="box-depoimentos" class="conditional-box">
+          <label>Adicionar Depoimentos de Clientes:</label>
+          <div id="lista-depoimentos">
+            <div class="dynamic-item">
+              <input type="text" class="depoimento-autor" placeholder="Nome do Cliente" style="margin-bottom: 8px;">
+              <textarea class="depoimento-texto" rows="2" placeholder="O que o cliente falou sobre sua empresa..."></textarea>
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addDynamicItem('lista-depoimentos', 'depoimento')">+ Adicionar Outro Depoimento</button>
+        </div>
+
+        <!-- CONDICIONAL: FAQ -->
+        <div id="box-faq" class="conditional-box">
+          <label>Perguntas Frequentes:</label>
+          <div id="lista-faq">
+            <div class="dynamic-item">
+              <input type="text" class="faq-pergunta" placeholder="Pergunta (Ex: Qual o horário de atendimento?)" style="margin-bottom: 8px;">
+              <input type="text" class="faq-resposta" placeholder="Resposta curta">
+            </div>
+          </div>
+          <button type="button" class="btn-add" onclick="addDynamicItem('lista-faq', 'faq')">+ Adicionar Outra Pergunta</button>
+        </div>
+
+        <!-- CONDICIONAL: GALERIA -->
+        <div id="box-galeria" class="conditional-box">
+          <div class="input-group">
+            <label>Link da Galeria de Fotos / Portfólio (Google Drive / Instagram)</label>
+            <input type="url" id="link_galeria" placeholder="https://...">
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO 4: Botão de Chamada para Ação (CTA) -->
+      <div class="form-section">
+        <div class="section-title">🎯 Botão Principal de Ação (CTA)</div>
+
+        <label class="checkbox-card" style="margin-bottom: 12px;">
+          <input type="checkbox" id="check_cta" onchange="toggleBox('box-cta', this.checked)" checked>
+          <span>Desejo personalizar o Botão Principal do site</span>
+        </label>
+
+        <div id="box-cta" class="conditional-box active">
+          <div class="input-group">
+            <label>O que você deseja escrito no botão? *</label>
+            <input type="text" id="cta_texto" value="Agendar no WhatsApp" placeholder="Ex: Comprar Agora, Solicitar Orçamento">
+          </div>
+
+          <div class="input-group">
+            <label>Para onde este botão deve levar o visitante? *</label>
+            <select id="cta_destino" onchange="alterarDestinoCTA(this.value)">
+              <option value="whatsapp">WhatsApp</option>
+              <option value="instagram">Instagram</option>
+              <option value="telefone">Ligação de Telefone</option>
+              <option value="email">Enviar E-mail</option>
+              <option value="link">Link Externo / Página Especifica</option>
+            </select>
+          </div>
+
+          <div id="box-cta-detalhe" class="input-group">
+            <label id="lbl-cta-detalhe">Mensagem Automática Inicial do WhatsApp (Opcional)</label>
+            <input type="text" id="cta_detalhe" placeholder="Ex: Olá, vim pelo site e gostaria de um orçamento!">
+          </div>
+        </div>
+      </div>
+
+      <!-- SEÇÃO 5: Contatos e Redes Sociais -->
+      <div class="form-section">
+        <div class="section-title">📲 Contato para Notificação & Redes Sociais</div>
+
+        <div class="input-group">
+          <label>Seu WhatsApp com DDD (Para receber o aviso do Robô) *</label>
+          <input type="tel" id="whatsapp" placeholder="Ex: 43984620902" required>
+        </div>
+
+        <div class="grid-2">
+          <div class="input-group">
+            <label>E-mail da Empresa</label>
+            <input type="email" id="email" placeholder="contato@empresa.com">
+          </div>
+          <div class="input-group">
+            <label>Endereço Físico (Caso queira exibir no site)</label>
+            <input type="text" id="endereco" placeholder="Ex: Av. Paulista, 1000 - SP">
+          </div>
+        </div>
+
+        <label style="margin-top: 10px; display: block;">Redes Sociais a Exibir:</label>
+        <div class="checkbox-grid" style="margin-top: 8px;">
+          <label class="checkbox-card"><input type="checkbox" onchange="toggleRedeSocial('box-redes-instagram', this.checked)"> Instagram</label>
+          <label class="checkbox-card"><input type="checkbox" onchange="toggleRedeSocial('box-redes-facebook', this.checked)"> Facebook</label>
+          <label class="checkbox-card"><input type="checkbox" onchange="toggleRedeSocial('box-redes-tiktok', this.checked)"> TikTok</label>
+          <label class="checkbox-card"><input type="checkbox" onchange="toggleRedeSocial('box-redes-youtube', this.checked)"> YouTube</label>
+          <label class="checkbox-card"><input type="checkbox" onchange="toggleRedeSocial('box-redes-linkedin', this.checked)"> LinkedIn</label>
+        </div>
+
+        <div id="box-redes-instagram" class="conditional-box">
+          <input type="text" id="rede_instagram" placeholder="Link do Instagram (Ex: instagram.com/suamarca)">
+        </div>
+        <div id="box-redes-facebook" class="conditional-box">
+          <input type="text" id="rede_facebook" placeholder="Link do Facebook">
+        </div>
+        <div id="box-redes-tiktok" class="conditional-box">
+          <input type="text" id="rede_tiktok" placeholder="Link do TikTok">
+        </div>
+        <div id="box-redes-youtube" class="conditional-box">
+          <input type="text" id="rede_youtube" placeholder="Link do canal do YouTube">
+        </div>
+        <div id="box-redes-linkedin" class="conditional-box">
+          <input type="text" id="rede_linkedin" placeholder="Link do perfil do LinkedIn">
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">
+        🚀 Gerar Meu Site Agora
+      </button>
+    </form>
+
+    <!-- TELA DE PROCESSAMENTO DA IA -->
+    <div id="loading-screen">
+      <div class="spinner"></div>
+      <h2>Sua Inteligência Artificial está trabalhando...</h2>
+      <p style="color: var(--text-muted); margin-top: 10px;">O robô está processando seu briefing e enviando a confirmação no seu WhatsApp...</p>
+    </div>
+
+    <!-- TELA DO SITE GERADO -->
+    <div id="result-screen">
+      <h2>🎉 Briefing Recebido e Site Gerado!</h2>
+      <p style="color: var(--text-muted);">A confirmação foi enviada para o seu WhatsApp!</p>
+      <iframe class="site-preview-frame" id="site-preview"></iframe>
+    </div>
+
+  </div>
+
+  <script>
+    // 1. FUNÇÃO PARA EXIBIR/OCULTAR CAIXAS CONDICIONAIS
+    function toggleBox(id, status) {
+      const box = document.getElementById(id);
+      if (status === undefined) {
+        box.classList.toggle('active');
+      } else if (status) {
+        box.classList.add('active');
+      } else {
+        box.classList.remove('active');
+      }
+    }
+
+    function toggleRedeSocial(id, status) {
+      toggleBox(id, status);
+    }
+
+    // 2. DESTINO DINÂMICO DO BOTÃO PRINCIPAL (CTA)
+    function alterarDestinoCTA(tipo) {
+      const lbl = document.getElementById('lbl-cta-detalhe');
+      const input = document.getElementById('cta_detalhe');
+
+      if (tipo === 'whatsapp') {
+        lbl.innerText = "Mensagem Automática Inicial do WhatsApp (Opcional)";
+        input.placeholder = "Ex: Olá, vim pelo site e gostaria de um orçamento!";
+      } else if (tipo === 'instagram') {
+        lbl.innerText = "Link do Seu Perfil do Instagram";
+        input.placeholder = "https://instagram.com/seu_perfil";
+      } else if (tipo === 'telefone') {
+        lbl.innerText = "Número do Telefone com DDD para Ligação Directa";
+        input.placeholder = "Ex: 43984620902";
+      } else if (tipo === 'email') {
+        lbl.innerText = "Endereço de E-mail de Destino";
+        input.placeholder = "contato@empresa.com";
+      } else {
+        lbl.innerText = "Link de Destino Completo";
+        input.placeholder = "https://suapagina.com.br";
+      }
+    }
+
+    // 3. ADICIONAR ITENS DINÂMICOS (Serviços, Produtos, FAQ, Depoimentos)
+    function addDynamicItem(containerId, tipo) {
+      const container = document.getElementById(containerId);
+      const div = document.createElement('div');
+      div.className = 'dynamic-item';
+
+      let html = '<button type="button" class="btn-remove" onclick="this.parentElement.remove()">Remover</button>';
+
+      if (tipo === 'servico') {
+        html += '<input type="text" class="servico-nome" placeholder="Nome do Serviço" style="margin-bottom: 8px;">';
+        html += '<input type="text" class="servico-desc" placeholder="Breve Descrição e Valor">';
+      } else if (tipo === 'produto') {
+        html += '<input type="text" class="produto-nome" placeholder="Nome do Produto" style="margin-bottom: 8px;">';
+        html += '<input type="text" class="produto-preco" placeholder="Preço (Ex: R$ 99,90)">';
+      } else if (tipo === 'depoimento') {
+        html += '<input type="text" class="depoimento-autor" placeholder="Nome do Cliente" style="margin-bottom: 8px;">';
+        html += '<textarea class="depoimento-texto" rows="2" placeholder="Depoimento do cliente..."></textarea>';
+      } else if (tipo === 'faq') {
+        html += '<input type="text" class="faq-pergunta" placeholder="Pergunta" style="margin-bottom: 8px;">';
+        html += '<input type="text" class="faq-resposta" placeholder="Resposta curta">';
+      }
+
+      div.innerHTML = html;
+      container.appendChild(div);
+    }
+
+    // 4. SUBMISSÃO DO FORMULÁRIO COM O NOVO FETCH AJUSTADO
+    const form = document.getElementById('site-form');
+    const loadingScreen = document.getElementById('loading-screen');
+    const resultScreen = document.getElementById('result-screen');
+    const sitePreview = document.getElementById('site-preview');
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
       const nome = document.getElementById('nome').value;
@@ -49,3 +714,11 @@ form.addEventListener('submit', async (e) => {
         `;
       }, 2000);
     });
+
+    // PWA Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
