@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // Configuração de CORS para aceitar chamadas do seu site
+  // Configurações de CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -9,23 +9,36 @@ export default async function handler(req, res) {
 
   try {
     const dados = req.body;
-    const { nome, whatsapp, nicho, descricao, imagens_personalizadas } = dados;
+    const { 
+      nome, 
+      whatsapp, 
+      nicho, 
+      descricao, 
+      slogan, 
+      publico_alvo, 
+      diferenciais, 
+      estilo, 
+      cor_primaria, 
+      cor_secundaria, 
+      cta_texto, 
+      imagens_personalizadas 
+    } = dados;
 
     if (!whatsapp) {
       return res.status(400).json({ success: false, error: 'O número de WhatsApp é obrigatório!' });
     }
 
-    // 1. Tratamento do número de WhatsApp
+    // Tratamento do número de WhatsApp
     let numeroLimpo = String(whatsapp).replace(/\D/g, '');
     if (!numeroLimpo.startsWith('55')) {
       numeroLimpo = '55' + numeroLimpo;
     }
 
-    // 2. CONFIGURAÇÃO DA API DA QWEN (DASHSCOPE)
+    // Configuração da API do Qwen (DashScope)
     const QWEN_API_KEY = process.env.QWEN_API_KEY || "sk-ws-H.DMEDIDR.A3e2.MEQCIBYvIBLMRQFijb7-GkusJzYzSbGUbSgRRNT_OFjGY2A3AiBvQiqyvky59UjJrwnpj6LhN6wSYGUfT6wqE3hnFSyhWQ";
     const QWEN_URL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions";
 
-    // 3. Tratamento condicional das imagens enviadas pelo cliente
+    // Tratamento condicional das imagens enviadas
     let instrucaoGaleriaImagens = "O CLIENTE NÃO ENVIOU IMAGENS PERSONALIZADAS. NUNCA CRIE UMA GALERIA OU QUADROS DE IMAGEM VAZIOS/SKELETONS NA PÁGINA. IGNORE ESSA SEÇÃO COMPLETAMENTE.";
     if (imagens_personalizadas && Array.isArray(imagens_personalizadas) && imagens_personalizadas.length > 0) {
       const fotosValidas = imagens_personalizadas.filter(img => img.url && img.url.trim().length > 5);
@@ -35,16 +48,34 @@ export default async function handler(req, res) {
       }
     }
 
-    // 4. PROMPT MASTER COMPLETO INTEGRADO
+    // Definição de regras de cores/tema de acordo com a opção selecionada no formulário
+    let instrucaoEstiloVisual = "";
+    if (estilo && estilo.includes("Clean")) {
+      instrucaoEstiloVisual = `ESTILO SOLICITADO: Clean e Claro (Minimalista).
+- O fundo do site DEVE SER CLARO (ex: #ffffff, #f8fafc ou #f1f5f9).
+- Textos principais em cores escuras e legíveis (ex: #0f172a, #1e293b).
+- Cards com fundo branco, sombras suaves (shadow-lg) e bordas discretas (#e2e8f0).
+- NUNCA use fundo preto/escuro global se essa opção foi selecionada.`;
+    } else if (estilo && estilo.includes("Colorido")) {
+      instrucaoEstiloVisual = `ESTILO SOLICITADO: Colorido e Vibrante.
+- Utilize gradientes chamativos e modernos, combinando a cor primaria (${cor_primaria || '#6366f1'}) e a cor secundaria (${cor_secundaria || '#22c55e'}).
+- Design dinâmico, alegre, com cards e badges bem destacados.`;
+    } else if (estilo && estilo.includes("Elegante")) {
+      instrucaoEstiloVisual = `ESTILO SOLICITADO: Elegante e Luxuoso.
+- Fundo escuro sofisticado (#090d16) com detalhes em Dourado/Bronze e paleta elegante.
+- Bordas finas brilhantes, fontes refinadas e sombras profundas.`;
+    } else {
+      instrucaoEstiloVisual = `ESTILO SOLICITADO: Moderno e Escuro (Dark Mode).
+- Fundo escuro luxuoso (#0b0f17) com cards semitransparentes em glassmorphism.`;
+    }
+
+    // PROMPT MASTER COMPLETO
     const promptMaster = `
 Você é um Engenheiro de Software Front-end e UX/UI Designer Sênior de nível internacional, especialista em criação de landing pages modernas, responsivas, visualmente sofisticadas e focadas em alta conversão.
-Sua missão é criar o código HTML5 completo de uma landing page de altíssima qualidade, utilizando as informações fornecidas abaixo.
+Sua missão é criar o código HTML5 completo de uma landing page de altíssima qualidade com base nas preferências selecionadas pelo usuário.
 
-REFERÊNCIA DE ESTILO, ESTRUTURA E QUALIDADE:
-Utilize como principal referência o seguinte site: https://pyerry-diniz-nutri-personal.vercel.app/
-Não copie o site literalmente. Utilize-o apenas como referência de estilo, qualidade visual, organização, identidade, experiência do usuário e proposta.
-Crie uma versão muito mais completa, extensa, sofisticada, moderna e visualmente superior.
-O design deve seguir uma estética moderna e sofisticada utilizando Dark Mode luxuoso, efeitos de profundidade, transparências, blur, gradientes sutis, cards modernos, bordas elegantes e elementos visuais que transmitam autoridade e profissionalismo.
+DIRETRIZES DE ESTILO VISUAL:
+${instrucaoEstiloVisual}
 
 REGRAS RÍGIDAS DE TÉCNICA E CÓDIGO:
 O código deve ser entregue em HTML5 completo, funcional e sem erros de codificação. Não utilize caracteres corrompidos.
@@ -63,56 +94,67 @@ O HTML DEVE iniciar obrigatoriamente com:
   <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
-    body { background-color: #0b0f17 !important; color: #f8fafc !important; overflow-x: hidden; }
     .container-custom { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
-    .bg-card { background-color: rgba(17, 24, 39, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); }
   </style>
 </head>
 
 DADOS DA EMPRESA E DO CLIENTE:
-- Nome/Marca: ${nome || 'Kaio - Especialista'}
+- Nome/Marca: ${nome || 'Sua Empresa'}
 - Segmento/Nicho: ${nicho || 'Serviços Profissionais'}
-- Descrição/História: ${descricao || 'Ajudando clientes a alcançarem resultados com estratégias de alto impacto.'}
-- Slogan: ${dados.slogan || ''}
-- Público-alvo: ${dados.publico_alvo || ''}
-- Diferenciais: ${dados.diferenciais || ''}
-- Cor de destaque (Botões/Links/Destaques): ${dados.cor_primaria || '#6366f1'}
-- Botão CTA: "${dados.cta_texto || 'Falar no WhatsApp'}"
+- Descrição/História: ${descricao || 'Ajudando clientes a alcançarem os melhores resultados.'}
+- Slogan: ${slogan || ''}
+- Público-alvo: ${publico_alvo || ''}
+- Diferenciais: ${diferenciais || ''}
+- Cor Primária de Destaque: ${cor_primaria || '#6366f1'}
+- Cor Secundária: ${cor_secundaria || '#22c55e'}
+- Botão CTA: "${cta_texto || 'Falar no WhatsApp'}"
 - WhatsApp do Botão: ${numeroLimpo}
 
 INSTRUÇÃO DE IMAGENS PERSONALIZADAS:
 ${instrucaoGaleriaImagens}
 
 DEPOIMENTOS — OBRIGATÓRIO:
-Crie exatamente 3 cards de depoimentos de clientes satisfeitos. Cada depoimento deve parecer natural e realista.
+Crie exatamente 3 cards de depoimentos de clientes satisfeitos com depoimentos realistas.
 Utilize obrigatoriamente estas imagens estáticas nos <img> dos depoimentos:
 - Cliente 1: https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80
 - Cliente 2: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80
 - Cliente 3: https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80
-Cada card deve conter foto com borda, nome, pequena identificação, depoimento e avaliação com 5 estrelas amarelas (<i class="fas fa-star text-yellow-400"></i>).
+Cada card deve ter a foto do cliente, nome, avaliação com 5 estrelas amarelas (<i class="fas fa-star text-yellow-400"></i>) e um texto explicativo e elogioso.
 
-FAQ — OBRIGATÓRIO:
-Crie uma seção com EXATAMENTE 8 perguntas frequentes relevantes com sistema de acordeão interativo em JavaScript (abrir e fechar suavemente com ícone + / - ou seta).
+FAQ (PERGUNTAS FREQUENTES COM RESPOSTAS) — OBRIGATÓRIO:
+- Crie uma seção com EXATAMENTE 6 a 8 perguntas frequentes relevantes sobre o nicho (${nicho}).
+- CADA PERGUNTA DEVE CONTER UMA RESPOSTA COMPLETA, ÚTIL E BEM ESCRITA!
+- Implemente um sistema de acordeão funcional em JavaScript (click na pergunta revela/esconde o parágrafo da resposta com animação suave).
+- JAMAIS Deixe perguntas vazias ou sem o texto da resposta explicativa!
+
+ESTRUTURA COMPLETA DA LANDING PAGE:
+1. HEADER FIXO com efeito Blur, logo/nome, links de navegação e botão CTA destacado para o WhatsApp. Menu mobile funcional.
+2. HERO SECTION impactante com Headline gigante, subhead persuasivo, badges de autoridade e botão principal estilo CTA.
+3. SEÇÃO DE ESTATÍSTICAS / NÚMEROS (Ex: +500 Clientes Atendidos, 99% Satisfação, +5 Anos).
+4. SEÇÃO SOBRE A EMPRESA com a história, missão e diferenciais.
+5. SEÇÃO DE SERVIÇOS E SOLUÇÕES em Grid de Cards com ícones FontAwesome e animações no hover.
+6. SEÇÃO BENEFÍCIOS E DIFERENCIAIS.
+7. SEÇÃO "COMO FUNCIONA" (3 a 5 passos).
+8. GALERIA DE IMAGENS PERSONALIZADAS (Somente se fornecidas. Se não houver, ignore e não crie quadros vazios).
+9. SEÇÃO DE DEPOIMENTOS (3 cards completos com foto e estrelas).
+10. SEÇÃO FAQ COMPLETA (Perguntas + Respostas detalhadas em acordeão funcional em JS).
+11. CTA FINAL persuasivo direcionando para o WhatsApp.
+12. FOOTER completo e centralizado.
 
 ANIMAÇÕES:
 - Inclua animações AOS ('data-aos="fade-up"') em seções, headlines, botões, cards e depoimentos.
-- No final da página (antes do </body>), inclua a inicialização da biblioteca AOS:
+- Antes do </body>, inclua a inicialização da biblioteca AOS e o script JS do Acordeão do FAQ:
   <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-  <script>AOS.init({ duration: 800, once: true });</script>
-
-ESTRUTURA COMPLETA DA LANDING PAGE:
-1. HEADER FIXO com efeito Blur, logo/nome, links de navegação e botão CTA destacado para o WhatsApp. Menu hambúrguer funcional para mobile.
-2. HERO SECTION impactante com Headline gigante, subhead persuasivo, badges de autoridade e botão principal estilo CTA.
-3. SEÇÃO DE AUTORIDADE E ESTATÍSTICAS com 3 ou 4 contadores de números (Ex: +500 Clientes Atendidos, 99% Satisfação, +5 Anos).
-4. SEÇÃO SOBRE A EMPRESA / PROFISSIONAL com história, missão e diferenciais bem estruturados.
-5. SEÇÃO DE SERVIÇOS E SOLUÇÕES em Grid de Cards modernos com ícones FontAwesome e hover.
-6. SEÇÃO BENEFÍCIOS E DIFERENCIAIS com checkmarks e destaques.
-7. SEÇÃO "COMO FUNCIONA" com passo a passo numerado (3 a 5 etapas).
-8. GALERIA DE IMAGENS PERSONALIZADAS (SOMENTE se houver imagens fornecidas no briefing. Caso contrário, NÃO CRIE essa seção nem quadros vazios).
-9. SEÇÃO DE DEPOIMENTOS (Exatamente 3 cards com as fotos Unsplash e 5 estrelas).
-10. SEÇÃO FAQ (Exatamente 8 perguntas sanfonadas interativas).
-11. CTA FINAL persuasivo direcionando para o WhatsApp.
-12. FOOTER completo e centralizado.
+  <script>
+    AOS.init({ duration: 800, once: true });
+    // Script funcional do FAQ
+    document.querySelectorAll('.faq-toggle').forEach(button => {
+      button.addEventListener('click', () => {
+        const content = button.nextElementSibling;
+        content.classList.toggle('hidden');
+      });
+    });
+  </script>
 
 FORMATO OBRIGATÓRIO DA RESPOSTA:
 Retorne EXCLUSIVAMENTE o código HTML5 completo do <!DOCTYPE html> até </html>.
@@ -120,7 +162,7 @@ Não escreva nenhuma explicação antes ou depois do código.
 Não utilize Markdown nem blocos de código tipo \`\`\`html.
 `;
 
-    // 5. Chamada para a API do Qwen (DashScope / OpenAI Compatible)
+    // Chamada para a API da Qwen (DashScope)
     const respQwen = await fetch(QWEN_URL, {
       method: 'POST',
       headers: {
@@ -128,9 +170,9 @@ Não utilize Markdown nem blocos de código tipo \`\`\`html.
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: "qwen-max", // Utiliza o modelo mais forte da Qwen
+        model: "qwen-max",
         messages: [
-          { role: "system", content: "Você é um compilador de código HTML/Tailwind de nível internacional. Retorne EXCLUSIVAMENTE o código HTML5 puro funcional, sem markdown, sem caixas de código e sem texto explicativo." },
+          { role: "system", content: "Você é um compilador de código HTML/Tailwind de nível internacional. Retorne EXCLUSIVAMENTE o código HTML5 puro funcional, respeitando o tema visual escolhido pelo usuário, sem markdown, sem caixas de código e sem texto explicativo." },
           { role: "user", content: promptMaster }
         ],
         temperature: 0.5
@@ -146,16 +188,16 @@ Não utilize Markdown nem blocos de código tipo \`\`\`html.
 
     let siteHtml = dataQwen?.choices?.[0]?.message?.content || "";
 
-    // Limpeza rigorosa de marcações de bloco da IA
+    // Limpeza de marcações markdown
     siteHtml = siteHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
 
     if (!siteHtml || siteHtml.length < 100) {
       return res.status(500).json({ success: false, error: 'A IA não retornou um código HTML válido.' });
     }
 
-    // 6. Notificação do Robô no Railway
+    // Notificação do Robô no Railway
     const URL_ROBO = 'https://bot-whatsapp-production-c379.up.railway.app/send-message';
-    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional Premium foi gerado com sucesso pela nossa Inteligência Artificial (Qwen)!\n\nAcesse a plataforma para visualizar a prévia completa em tela cheia.`;
+    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional foi gerado com sucesso no estilo ${estilo || 'selecionado'}!\n\nAcesse a plataforma para visualizar a prévia completa.`;
 
     try {
       await fetch(URL_ROBO, {
