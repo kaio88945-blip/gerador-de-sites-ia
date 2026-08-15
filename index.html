@@ -6,11 +6,6 @@
   <title>CreateSite AI - Gerador Automático de Sites</title>
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#6366f1">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="SiteIA">
-  
-  <!-- Fonte Inter Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -28,12 +23,7 @@
       --border: rgba(255, 255, 255, 0.1);
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Inter', sans-serif;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
 
     body {
       background: radial-gradient(circle at top left, #1e1b4b, #0f172a);
@@ -46,121 +36,18 @@
       padding-bottom: 90px;
     }
 
-    /* Container Principal */
     .container {
       width: 100%;
       max-width: 720px;
       background: var(--card-bg);
       backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 35px 25px;
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-      animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @keyframes pulseGlow {
-      0%, 100% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.4); }
-      50% { box-shadow: 0 0 30px rgba(99, 102, 241, 0.8); }
-    }
-
-    /* Banner no Topo de Instalação PWA */
-    #btn-instalar {
-      display: none;
-      width: 100%;
-      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-      color: white;
-      border: none;
-      padding: 14px;
-      border-radius: 12px;
-      font-weight: 700;
-      font-size: 0.95rem;
-      cursor: pointer;
-      margin-bottom: 25px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      transition: all 0.3s ease;
-      animation: pulseGlow 2s infinite;
-    }
-
-    #btn-instalar:hover {
-      transform: translateY(-2px);
-      filter: brightness(1.1);
-    }
-
-    /* Pop-up Flutuante de Instalação no Rodapé */
-    .install-popup {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%) translateY(180%);
-      width: 90%;
-      max-width: 420px;
-      background: #1e293b;
-      border: 1px solid var(--primary);
-      padding: 16px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      z-index: 9999;
-      transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    .install-popup.show {
-      transform: translateX(-50%) translateY(0);
-    }
-
-    .popup-info h4 {
-      font-size: 0.95rem;
-      color: #fff;
-      margin-bottom: 2px;
-    }
-
-    .popup-info p {
-      font-size: 0.8rem;
-      color: #94a3b8;
-    }
-
-    .popup-btn {
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 10px 16px;
-      border-radius: 8px;
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-
-    /* Aviso de Instalação iOS (iPhone) */
-    #ios-prompt {
-      display: none;
-      background: rgba(99, 102, 241, 0.15);
-      border: 1px solid var(--primary);
-      padding: 12px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      font-size: 0.85rem;
-      color: #cbd5e1;
-      text-align: center;
-    }
-
-    /* Cabeçalho */
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
+    .header { text-align: center; margin-bottom: 30px; }
     .header h1 {
       font-size: 2.2rem;
       font-weight: 800;
@@ -169,55 +56,16 @@
       -webkit-text-fill-color: transparent;
       margin-bottom: 8px;
     }
+    .header p { color: var(--text-muted); font-size: 0.95rem; }
 
-    .header p {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-    }
+    .form-section { margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+    .section-title { font-size: 1.1rem; font-weight: 600; color: #e2e8f0; margin-bottom: 15px; }
 
-    /* Seções do Formulário */
-    .form-section {
-      margin-bottom: 25px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 20px;
-    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+    @media (max-width: 580px) { .grid-2 { grid-template-columns: 1fr; } }
 
-    .form-section:last-of-type {
-      border-bottom: none;
-    }
-
-    .section-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #e2e8f0;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-    }
-
-    @media (max-width: 580px) {
-      .grid-2 { grid-template-columns: 1fr; }
-    }
-
-    .input-group {
-      display: flex;
-      flex-direction: column;
-      margin-bottom: 15px;
-    }
-
-    label {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      margin-bottom: 6px;
-    }
+    .input-group { display: flex; flex-direction: column; margin-bottom: 15px; }
+    label { font-size: 0.85rem; font-weight: 500; color: var(--text-muted); margin-bottom: 6px; }
 
     input, textarea, select {
       background: rgba(15, 23, 42, 0.6);
@@ -226,17 +74,9 @@
       padding: 12px 14px;
       color: var(--text-main);
       font-size: 0.95rem;
-      transition: all 0.25s ease;
       outline: none;
     }
 
-    input:focus, textarea:focus, select:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
-      background: rgba(15, 23, 42, 0.9);
-    }
-
-    /* Botão de Envio */
     .btn-submit {
       width: 100%;
       background: linear-gradient(135deg, var(--primary), var(--primary-hover));
@@ -247,26 +87,9 @@
       font-size: 1.05rem;
       font-weight: 700;
       cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 10px;
-      margin-top: 10px;
     }
 
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-    }
-
-    /* Tela de Carregamento / Status */
-    #loading-screen {
-      display: none;
-      text-align: center;
-      padding: 30px 0;
-    }
-
+    #loading-screen { display: none; text-align: center; padding: 30px 0; }
     .spinner {
       width: 60px;
       height: 60px;
@@ -276,62 +99,9 @@
       animation: spin 1s linear infinite;
       margin: 0 auto 20px auto;
     }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    .status-step {
-      font-size: 0.95rem;
-      color: var(--text-muted);
-      margin-top: 15px;
-      transition: all 0.3s ease;
-    }
-
-    /* Tela do Site Gerado e Cronômetro */
-    #result-screen {
-      display: none;
-      text-align: center;
-    }
-
-    .alert-banner {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid var(--danger);
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 25px;
-    }
-
-    .alert-banner h3 {
-      color: #f87171;
-      margin-bottom: 8px;
-    }
-
-    .timer {
-      font-size: 2.2rem;
-      font-weight: 800;
-      color: #ef4444;
-      letter-spacing: 2px;
-      margin: 10px 0;
-    }
-
-    .btn-pay {
-      background: linear-gradient(135deg, #22c55e, #16a34a);
-      color: white;
-      text-decoration: none;
-      padding: 15px 25px;
-      border-radius: 12px;
-      font-weight: 700;
-      display: inline-block;
-      margin-top: 15px;
-      transition: all 0.3s ease;
-    }
-
-    .btn-pay:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
-    }
-
+    #result-screen { display: none; text-align: center; }
     .site-preview-frame {
       width: 100%;
       height: 400px;
@@ -345,305 +115,115 @@
 <body>
 
   <div class="container">
-    
-    <!-- Botão de Instalação PWA (Topo) -->
-    <button id="btn-instalar">📲 Instalar App no Celular</button>
-
-    <!-- Instrução para iPhone (iOS) -->
-    <div id="ios-prompt">
-      💡 Para instalar no iPhone: toque no ícone de <strong>Compartilhar</strong> (no Safari) e escolha <strong>"Adicionar à Tela de Início"</strong>.
-    </div>
-
-    <!-- FORMULÁRIO PRINCIPAL -->
     <form id="site-form">
       <div class="header">
         <h1>Criador de Sites IA</h1>
-        <p>Preencha as informações do seu negócio. A IA criará o seu site e enviará a notificação no seu WhatsApp!</p>
+        <p>Preencha os dados do seu negócio. O robô enviará a confirmação diretamente no seu WhatsApp!</p>
       </div>
 
-      <!-- SEÇÃO 1: Dados do Negócio -->
       <div class="form-section">
         <div class="section-title">🏢 Informações do Negócio</div>
-        
         <div class="grid-2">
           <div class="input-group">
             <label>Nome da Empresa / Marca *</label>
             <input type="text" id="nome" placeholder="Ex: Barber Shop Silva" required>
           </div>
-          
           <div class="input-group">
             <label>Nicho / Categoria *</label>
             <select id="nicho" required>
               <option value="" disabled selected>Selecione uma opção</option>
               <option value="Restaurante / Alimentação">Restaurante / Alimentação</option>
               <option value="Beleza e Estética">Beleza e Estética</option>
-              <option value="Saúde e Bem-estar">Saúde e Bem-estar</option>
               <option value="Serviços Prestados">Serviços Prestados / Freelancer</option>
               <option value="Loja Virtual / Produtos">Loja / E-commerce</option>
-              <option value="Outro">Outro</option>
             </select>
           </div>
         </div>
-
-        <div class="input-group">
-          <label>Slogan ou Frase de Impacto</label>
-          <input type="text" id="slogan" placeholder="Ex: O melhor corte da cidade com estilo único">
-        </div>
-
         <div class="input-group">
           <label>Descrição Detalhada do Negócio *</label>
-          <textarea id="descricao" rows="3" placeholder="Explique o que sua empresa faz, história e diferenciais..." required></textarea>
+          <textarea id="descricao" rows="3" placeholder="Explique o que sua empresa faz..." required></textarea>
         </div>
       </div>
 
-      <!-- SEÇÃO 2: Serviços e Visual -->
       <div class="form-section">
-        <div class="section-title">🎨 Serviços e Estilo Visual</div>
-
+        <div class="section-title">📲 Contato para Receber a Notificação</div>
         <div class="input-group">
-          <label>Principais Produtos / Serviços Prestados *</label>
-          <textarea id="servicos" rows="2" placeholder="Ex: Corte Degradê (R$ 40), Barba Completa (R$ 30)..." required></textarea>
-        </div>
-
-        <div class="grid-2">
-          <div class="input-group">
-            <label>Estilo Visual / Cores</label>
-            <select id="estilo">
-              <option value="Moderno e Escuro (Dark Mode)">Moderno e Escuro (Dark)</option>
-              <option value="Clean e Claro">Clean e Claro (Minimalista)</option>
-              <option value="Colorido e Vibrante">Colorido e Vibrante</option>
-              <option value="Elegante e Luxuoso">Elegante e Luxuoso (Dourado/Preto)</option>
-            </select>
-          </div>
-
-          <div class="input-group">
-            <label>Ação do Botão Principal (CTA)</label>
-            <input type="text" id="cta" placeholder="Ex: Agendar no WhatsApp / Comprar Agora">
-          </div>
+          <label>Seu WhatsApp com DDD *</label>
+          <input type="tel" id="whatsapp" placeholder="Ex: 43984620902" required>
         </div>
       </div>
 
-      <!-- SEÇÃO 3: Contato e Localização -->
-      <div class="form-section">
-        <div class="section-title">📲 Contatos e Redes Sociais</div>
-
-        <div class="grid-2">
-          <div class="input-group">
-            <label>Seu WhatsApp (com DDD) *</label>
-            <input type="tel" id="whatsapp" placeholder="Ex: 5543984620902" required>
-          </div>
-
-          <div class="input-group">
-            <label>Instagram / Redes Sociais</label>
-            <input type="text" id="redes" placeholder="@seuinstagram">
-          </div>
-        </div>
-
-        <div class="grid-2">
-          <div class="input-group">
-            <label>Endereço / Cidade</label>
-            <input type="text" id="endereco" placeholder="Ex: Av. Paulista, 1000 - SP (ou Online)">
-          </div>
-
-          <div class="input-group">
-            <label>Horário de Funcionamento</label>
-            <input type="text" id="horario" placeholder="Ex: Seg a Sáb das 08h às 19h">
-          </div>
-        </div>
-      </div>
-
-      <button type="submit" class="btn-submit" id="btn-gerar">
-        <span>🚀 Gerar Meu Site Agora</span>
+      <button type="submit" class="btn-submit">
+        🚀 Gerar Meu Site Agora
       </button>
     </form>
 
-    <!-- TELA DE PROCESSAMENTO DA IA -->
     <div id="loading-screen">
       <div class="spinner"></div>
       <h2>Sua Inteligência Artificial está trabalhando...</h2>
-      <div class="status-step" id="status-text">📱 Conectando com a API e gerando seu site...</div>
+      <p style="color: var(--text-muted); margin-top: 10px;">O robô está enviando a confirmação no seu WhatsApp...</p>
     </div>
 
-    <!-- TELA DO SITE GERADO E CONTADOR DE EXPIRAÇÃO -->
     <div id="result-screen">
-      <div class="alert-banner">
-        <h3>⚠️ O seu site será expirado em breve!</h3>
-        <p>Caso não efetue o pagamento, seu site sairá do ar em:</p>
-        <div class="timer" id="timer">30:00</div>
-        <a href="#" class="btn-pay" id="btn-pagar">💳 Garantir Meu Site Definitivo</a>
-      </div>
-
-      <h2>🎉 Seu Site Está Pronto!</h2>
-      <p style="color: var(--text-muted); margin-top: 5px;">Abaixo está a prévia gerada pela Inteligência Artificial:</p>
-
-      <iframe class="site-preview-frame" id="site-preview" srcdoc="<h1>Carregando seu site...</h1>"></iframe>
+      <h2>🎉 Seu Site Foi Gerado!</h2>
+      <p style="color: var(--text-muted);">Confira a mensagem enviada no seu WhatsApp!</p>
+      <iframe class="site-preview-frame" id="site-preview"></iframe>
     </div>
-
-  </div>
-
-  <!-- POP-UP FLUTUANTE DE INSTALAÇÃO NO RODAPÉ -->
-  <div id="popup-instalacao" class="install-popup">
-    <div class="popup-info">
-      <h4>Instalar Aplicativo</h4>
-      <p>Baixe para acessar rápido na tela do celular</p>
-    </div>
-    <button id="btn-popup-instalar" class="popup-btn">Instalar</button>
   </div>
 
   <script>
-    // 1. LÓGICA DO PWA (Instalação)
-    let deferredPrompt;
-    const btnInstalar = document.getElementById('btn-instalar');
-    const popup = document.getElementById('popup-instalacao');
-    const btnPopupInstalar = document.getElementById('btn-popup-instalar');
-    const iosPrompt = document.getElementById('ios-prompt');
-
-    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-
-    if (isIos && !isStandalone) {
-      iosPrompt.style.display = 'block';
-    }
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      btnInstalar.style.display = 'block';
-      setTimeout(() => { popup.classList.add('show'); }, 1500);
-    });
-
-    btnInstalar.addEventListener('click', () => {
-      btnInstalar.style.display = 'none';
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-      }
-    });
-
-    btnPopupInstalar.addEventListener('click', () => {
-      popup.classList.remove('show');
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(() => { deferredPrompt = null; });
-      }
-    });
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js');
-    }
-
-    // 2. SUBMISSÃO REAL PARA A API DA VERCEL + DISPARO NO RAILWAY
     const form = document.getElementById('site-form');
     const loadingScreen = document.getElementById('loading-screen');
     const resultScreen = document.getElementById('result-screen');
-    const statusText = document.getElementById('status-text');
     const sitePreview = document.getElementById('site-preview');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
+      const nome = document.getElementById('nome').value;
+      const nicho = document.getElementById('nicho').value;
+      const descricao = document.getElementById('descricao').value;
+      const whatsapp = document.getElementById('whatsapp').value;
+
       form.style.display = 'none';
       loadingScreen.style.display = 'block';
 
-      // Tratamento do WhatsApp (deixa apenas números e garante o 55)
-      let numWhatsapp = document.getElementById('whatsapp').value.replace(/\D/g, '');
-      if (!numWhatsapp.startsWith('55')) {
-        numWhatsapp = '55' + numWhatsapp;
-      }
-
-      const dados = {
-        nome: document.getElementById('nome').value,
-        nicho: document.getElementById('nicho').value,
-        slogan: document.getElementById('slogan').value,
-        descricao: document.getElementById('descricao').value,
-        servicos: document.getElementById('servicos').value,
-        estilo: document.getElementById('estilo').value,
-        cta: document.getElementById('cta').value || 'Entrar em Contato',
-        whatsapp: numWhatsapp,
-        redes: document.getElementById('redes').value,
-        endereco: document.getElementById('endereco').value,
-        horario: document.getElementById('horario').value
-      };
-
       try {
-        statusText.innerText = "🤖 Enviando pedido para a Inteligência Artificial...";
-
-        // Chamada REAL para a API /api/gerar na Vercel
-        const response = await fetch('/api/gerar', {
+        // Envia os dados para a API na Vercel (que aciona o Robô no Railway)
+        await fetch('/api/gerar', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            nome: dados.nome,
-            whatsapp: dados.whatsapp,
-            ideia: `${dados.nicho} - ${dados.descricao}`
+            nome: nome,
+            whatsapp: whatsapp,
+            ideia: `${nicho} - ${descricao}`
           })
         });
-
-        const resData = await response.json();
-
-        if (resData.success) {
-          statusText.innerText = "🚀 Notificação enviada para o WhatsApp com sucesso!";
-        } else {
-          console.error("Erro na API:", resData.error);
-          statusText.innerText = "⚠️ Erro ao enviar mensagem, mas gerando prévia...";
-        }
-
       } catch (err) {
-        console.error("Erro na requisição:", err);
+        console.error("Erro na chamada da API:", err);
       }
 
-      // Conclusão e Exibição do Resultado
       setTimeout(() => {
         loadingScreen.style.display = 'none';
         resultScreen.style.display = 'block';
-        
-        // Link atualizado usando api.whatsapp.com com target="_blank" para evitar bloqueio no iframe
+
+        // Mostra a prévia simples do site na tela
         sitePreview.srcdoc = `
           <!DOCTYPE html>
-          <html lang="pt-BR">
+          <html>
           <head>
-            <style>
-              body { font-family: sans-serif; padding: 20px; background: #0f172a; color: white; text-align: center; }
-              .btn { background: #22c55e; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; display: inline-block; margin-top: 15px; }
-            </style>
+            <style>body { font-family: sans-serif; padding: 20px; background: #0f172a; color: white; text-align: center; }</style>
           </head>
           <body>
-            <h1>${dados.nome}</h1>
-            <p><em>${dados.slogan || dados.nicho}</em></p>
+            <h1>${nome}</h1>
+            <p>${nicho}</p>
             <hr style="border-color: #333; margin: 20px 0;">
-            <p>${dados.descricao}</p>
-            <h3 style="margin-top: 20px;">Nossos Serviços</h3>
-            <p>${dados.servicos}</p>
-            <a href="https://api.whatsapp.com/send?phone=${dados.whatsapp}" target="_blank" class="btn">${dados.cta}</a>
+            <p>${descricao}</p>
           </body>
           </html>
         `;
-
-        startTimer(30 * 60);
-      }, 2000);
+      }, 3000);
     });
-
-    // 3. CRONÔMETRO
-    function startTimer(duration) {
-      let timer = duration, minutes, seconds;
-      const display = document.getElementById('timer');
-      
-      const interval = setInterval(() => {
-        minutes = parseInt(timer / 60, 10);
-        seconds = parseInt(timer % 60, 10);
-
-        minutes = minutes < 10 ? "0" + minutes : minutes;
-        seconds = seconds < 10 ? "0" + seconds : seconds;
-
-        display.textContent = minutes + ":" + seconds;
-
-        if (--timer < 0) {
-          clearInterval(interval);
-          display.textContent = "EXPIRADO";
-          alert("Atenção! O tempo de teste expirou. Realize o pagamento para reativar o site.");
-        }
-      }, 1000);
-    }
   </script>
 </body>
 </html>
