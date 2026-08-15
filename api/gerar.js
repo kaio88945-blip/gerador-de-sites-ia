@@ -19,61 +19,52 @@ export default async function handler(req, res) {
       numeroLimpo = '55' + numeroLimpo;
     }
 
-    // API KEY DA GROQ
     const GROQ_API_KEY = process.env.GROQ_API_KEY || "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";
     const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 
-    // PROMPT BASE MASTER COM A SUA REFERÊNCIA
     const promptMaster = `
-Você é um Copywriter, Engenheiro de Software e Web Designer de nível mundial especializado em Landing Pages de Alta Conversão.
-Crie o código completo de um site extremamente profissional, moderno, elegante e visualmente impressionante em UM ÚNICO ARQUIVO HTML5 PURO.
+Você é um Web Designer e Copywriter especialista em criar Landing Pages de Alta Conversão no estilo Dark Mode de luxo.
+Crie um site extremamente profissional, moderno e completo em um ÚNICO arquivo HTML.
 
-INSTRUÇÕES E PROMPT BASE DE REFERÊNCIA:
-Crie um site profissional tomando como principal referência a estrutura, proposta e organização do seguinte site: https://pyerry-diniz-nutri-personal.vercel.app/
-Não copie o site exatamente. Utilize-o apenas como referência de estrutura, proposta e organização das informações, mas desenvolva uma versão mais completa, moderna, sofisticada e visualmente superior.
-O novo site deve ser significativamente mais extenso, com mais seções, informações e elementos visuais que transmitam profissionalismo, autoridade e qualidade.
+REFERÊNCIA VISUAL DE ESTILO:
+Tome como referência a landing page https://pyerry-diniz-nutri-personal.vercel.app/
+O site DEVE ser em Dark Mode escuro e sofisticado (use cores de fundo escuro como #0f172a, #0b0f17, #1e293b e textos em branco #ffffff ou cinza claro #f1f5f9). NUNCA deixe o fundo branco.
 
-DESIGN E EXPERIÊNCIA VISUAL:
-- Desenvolva um design premium, moderno e elegante (use Dark Theme escuro e sofisticado ou cores elegantes ajustadas ao negócio).
-- Crie uma identidade visual mais impactante e sofisticada que a do site de referência.
-- Utilize uma hierarquia visual clara, com títulos fortes e chamadas para ação (CTA) bem destacadas.
-- O layout deve ser 100% responsivo, funcionando perfeitamente em celulares, tablets e computadores (priorizando mobile).
-- Utilize Tailwind CSS no <head> (<script src="https://cdn.tailwindcss.com"></script>).
-- Utilize FontAwesome para ícones (<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">).
-- Utilize a biblioteca AOS para animações de rolagem no <head> e <script> (<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" /> e no final da página <script src="https://unpkg.com/aos@next/dist/aos.js"></script> e inicialize com <script>AOS.init({duration: 800, once: true});</script>).
+REGRAS DE TECNOLOGIA:
+1. Inclua o Tailwind CSS no <head>: <script src="https://cdn.tailwindcss.com"></script>
+2. Inclua FontAwesome no <head>: <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+3. Garanta CSS inline no <head> para evitar telas brancas:
+   <style>
+     body { background-color: #0b0f17 !important; color: #f8fafc !important; font-family: sans-serif; margin: 0; padding: 0; }
+     .bg-card { background-color: #111827; border: 1px solid rgba(255,255,255,0.1); }
+   </style>
 
-DADOS DA EMPRESA / CLIENTE RECEBIDOS DO FORMULÁRIO:
-- Nome da Empresa/Marca: ${nome || 'Empresa'}
-- Segmento/Nicho: ${nicho || 'Serviços Profissionais'}
-- Slogan/Frase: ${dados.slogan || ''}
-- Descrição/História/Serviços: ${descricao || 'Ajudando clientes com soluções de excelência.'}
+DADOS DO CLIENTE PARA INJETAR NO SITE:
+- Nome/Marca: ${nome || 'Kaio - Especialista'}
+- Nicho/Área: ${nicho || 'Marketing e Vendas'}
+- Sobre/História: ${descricao || 'Ajudando clientes a alcançarem resultados com estratégias de alto impacto.'}
+- Slogan: ${dados.slogan || ''}
 - Público Alvo: ${dados.publico_alvo || ''}
 - Diferenciais: ${dados.diferenciais || ''}
-- Estilo Visual: ${dados.estilo || 'Elegante e Luxuoso'}
-- Cor Principal: ${dados.cor_primaria || '#6366f1'}
-- Botão Principal (CTA): ${dados.cta_texto || 'Entrar em Contato'}
-- WhatsApp de Contato: ${numeroLimpo}
+- Cor de Destaque / Botões: ${dados.cor_primaria || '#6366f1'}
+- Texto do Botão CTA: ${dados.cta_texto || 'Entrar em Contato no WhatsApp'}
+- WhatsApp do Botão: ${numeroLimpo}
 
-ESTRUTURA OBRIGATÓRIA DA LANDING PAGE (SEJA MUITO COMPLETO E EXTENSO):
-1. Header moderno e responsivo fixo com blur/transparência, logo/nome e botões de navegação.
-2. Hero Section impactante com título de autoridade gigante, subhead envolvente, selos de garantia e botão principal CTA do WhatsApp.
-3. Seção Estatísticas / Números de Impacto (Contadores como +500 Clientes, 99% Satisfação, etc.).
-4. Seção Apresentação Profissional e Sobre a Empresa (História persuasiva, diferenciais).
-5. Seção de Serviços / Planos / Soluções formatada em Cards 3D interativos com ícones e hover.
-6. Seção Processo de Funcionamento / Passo a Passo (Como funciona o serviço).
-7. Seção de Oferta Especial / Promoção com gatilho de urgência.
-8. Seção de Depoimentos: Adicione 3 depoimentos realistas com fotos de perfil reais do Unsplash (ex: https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150, https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150), nomes, identificação do cliente, texto natural e avaliação 5 estrelas amarelas.
-9. Seção FAQ (Perguntas Frequentes): Adicione uma seção com 8 perguntas frequentes relevantes com sistema de acordeão interativo em JavaScript.
-10. Seção Final de Conversão (CTA de fechamento) + Footer completo com redes sociais e contatos.
+ESTRUTURA COMPLETA DA LANDING PAGE (CRIE SEÇÕES RICAS E EXTENSAS):
+1. Header fixo com efeito vidro (backdrop-blur), logo/nome e links de navegação.
+2. Hero Section com Headline gigante persuasiva, subhead descritivo, selos de garantia e botão CTA estiloso para WhatsApp.
+3. Seção de Números/Estatísticas em destaque (Ex: +500 Clientes, 99% Satisfação, etc.).
+4. Seção "Sobre Nós / Apresentação Profissional" bem estruturada.
+5. Seção "Nossos Serviços / Soluções" com cards modernos e ícones do FontAwesome.
+6. Seção "Processo de Funcionamento / Passo a Passo".
+7. Seção de Depoimentos de Clientes: 3 cards elegantes com avatares do Unsplash e 5 estrelas amarelas.
+8. Seção FAQ (Perguntas Frequentes): 6 perguntas e respostas expandidas em formato de lista visual elegante.
+9. Seção de Chamada Final para Ação (CTA) com botão do WhatsApp chamativo.
+10. Footer completo com contatos e redes sociais.
 
-ANIMAÇÕES OBRIGATÓRIAS:
-- Adicione atributos data-aos="fade-up", data-aos="zoom-in", data-aos="fade-right" nas seções, cards, títulos e depoimentos para criar animações fluidas e elegantes durante a rolagem da página.
-- Adicione script de JavaScript para o acordeão do FAQ funcionar ao clicar.
-
-IMPORTANTE: Retorne APENAS o código HTML puro começando diretamente em <!DOCTYPE html> e terminando em </html>. Não inclua conversas, explicações antes/depois ou marcações do tipo \`\`\`html.
+IMPORTANTE: Retorne APENAS o código HTML5 completo e funcional começando diretamente em <!DOCTYPE html> e terminando em </html>. NÃO use blocos de marcação markdown como \`\`\`html.
 `;
 
-    // Chamada para a API da Groq (Llama 3.3 70B)
     const respGroq = await fetch(GROQ_URL, {
       method: 'POST',
       headers: {
@@ -83,10 +74,10 @@ IMPORTANTE: Retorne APENAS o código HTML puro começando diretamente em <!DOCTY
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
         messages: [
-          { role: "system", content: "Você é um gerador de código HTML/Tailwind altamente preciso que retorna apenas código web funcional e de design premium." },
+          { role: "system", content: "Você é um gerador de código HTML/Tailwind altamente preciso que retorna apenas código web funcional em Dark Mode estilo luxo." },
           { role: "user", content: promptMaster }
         ],
-        temperature: 0.7,
+        temperature: 0.6,
         max_tokens: 4096
       })
     });
@@ -100,16 +91,15 @@ IMPORTANTE: Retorne APENAS o código HTML puro começando diretamente em <!DOCTY
 
     let siteHtml = dataGroq?.choices?.[0]?.message?.content || "";
 
-    // Limpeza de marcações markdown
     siteHtml = siteHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
 
     if (!siteHtml || siteHtml.length < 100) {
       return res.status(500).json({ success: false, error: 'A IA não retornou um código HTML válido.' });
     }
 
-    // Notificação do Robô no Railway
+    // Notificação do Robô
     const URL_ROBO = 'https://bot-whatsapp-production-c379.up.railway.app/send-message';
-    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional no modelo Premium foi gerado com sucesso pela nossa Inteligência Artificial!\n\nAcesse a plataforma para visualizar a prévia completa em tela cheia!`;
+    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional em Dark Mode foi gerado com sucesso pela nossa IA!\n\nAcesse a plataforma para visualizar a prévia completa em tela cheia.`;
 
     try {
       await fetch(URL_ROBO, {
