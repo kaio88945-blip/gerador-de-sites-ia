@@ -28,54 +28,47 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'O número de WhatsApp é obrigatório!' });
     }
 
-    // 3. TRATAMENTO DAS INFORMAÇÕES OPCIONAIS (Montagem dos blocos condicionais)
-    
-    // Visual / Identidade
+    // 3. TRATAMENTO DAS INFORMAÇÕES OPCIONAIS
     const estilo = dados.estilo || '';
     const cor_primaria = dados.cor_primaria || '#6366f1';
     const cor_secundaria = dados.cor_secundaria || '#22c55e';
     const link_logo = dados.link_logo || '';
 
-    // Imagens Personalizadas
-    let instrucaoImagensPersonalizadas = "Nenhuma imagem personalizada foi enviada pelo cliente. Não crie quadros de galeria vazios ou placeholders de foto sem sentido.";
+    // Imagens Personalizadas enviadas pelo cliente
+    let instrucaoImagensPersonalizadas = "O cliente NÃO enviou fotos personalizadas. NUNCA crie galerias vazias, nem coloque quadros cinzas de fotos e NUNCA coloque fotos aleatórias do Unsplash como imagem de fundo de seções.";
     if (dados.imagens_personalizadas && Array.isArray(dados.imagens_personalizadas) && dados.imagens_personalizadas.length > 0) {
       const imgsValidas = dados.imagens_personalizadas.filter(img => img.url && img.url.trim().length > 5);
       if (imgsValidas.length > 0) {
-        instrucaoImagensPersonalizadas = "O cliente enviou as seguintes imagens personalizadas com descrições. Posicione cada uma na seção mais adequada conforme a intenção:\n" +
-          imgsValidas.map((img, i) => `- Imagem ${i + 1}: URL="${img.url}" | Descrição="${img.descricao || 'Foto institucional/produto'}"`).join("\n");
+        instrucaoImagensPersonalizadas = "O cliente enviou as seguintes imagens personalizadas reais. Utilize-as estrategicamente nos locais indicados por suas descrições:\n" +
+          imgsValidas.map((img, i) => `- Imagem ${i + 1}: URL="${img.url}" | Uso/Descrição="${img.descricao || 'Foto do cliente'}"`).join("\n");
       }
     }
 
-    // Seção Opcional: Serviços
+    // Blocos Condicionais de Seções Opcionais
     let blocoServicos = "O cliente NÃO enviou uma lista de serviços. NÃO crie a seção de serviços no site.";
     if (dados.servicos && Array.isArray(dados.servicos) && dados.servicos.length > 0) {
       blocoServicos = "CRIE A SEÇÃO DE SERVIÇOS com os seguintes itens fornecidos:\n" + JSON.stringify(dados.servicos, null, 2);
     }
 
-    // Seção Opcional: Produtos
     let blocoProdutos = "O cliente NÃO enviou uma lista de produtos. NÃO crie a seção de produtos no site.";
     if (dados.produtos && Array.isArray(dados.produtos) && dados.produtos.length > 0) {
       blocoProdutos = "CRIE A SEÇÃO DE PRODUTOS com os seguintes itens fornecidos:\n" + JSON.stringify(dados.produtos, null, 2);
     }
 
-    // Seção Opcional: Oferta Especial
     let blocoOferta = "O cliente NÃO enviou uma oferta especial. NÃO crie a seção de oferta/promoção no site.";
     if (dados.oferta && (dados.oferta.titulo || dados.oferta_titulo)) {
       blocoOferta = "CRIE UMA SEÇÃO DE OFERTA/PROMOÇÃO DE ALTA CONVERSÃO com os seguintes dados:\n" + JSON.stringify(dados.oferta, null, 2);
     }
 
-    // Seção Opcional: Galeria
     let blocoGaleria = "O cliente NÃO forneceu link de galeria/portfólio. NÃO crie a seção de galeria.";
     if (dados.link_galeria && dados.link_galeria.trim().length > 5) {
-      blocoGaleria = `CRIE A SEÇÃO DE GALERIA/PORTFÓLIO apontando ou destacando este recurso: ${dados.link_galeria}`;
+      blocoGaleria = `CRIE A SEÇÃO DE GALERIA/PORTFÓLIO apontando para: ${dados.link_galeria}`;
     }
 
-    // Informações de Contato Adicionais
     const email = dados.email || '';
     const endereco = dados.endereco || '';
     const redes_sociais = dados.redes_sociais || {};
 
-    // Configuração do CTA Principal
     const cta_texto = dados.cta_texto || 'Falar no WhatsApp';
     const cta_destino = dados.cta_destino || 'whatsapp';
     const cta_detalhe = dados.cta_detalhe || '';
@@ -84,22 +77,28 @@ export default async function handler(req, res) {
     const QWEN_API_KEY = process.env.QWEN_API_KEY || "sk-ws-H.DMEDIDR.A3e2.MEQCIBYvIBLMRQFijb7-GkusJzYzSbGUbSgRRNT_OFjGY2A3AiBvQiqyvky59UjJrwnpj6LhN6wSYGUfT6wqE3hnFSyhWQ";
     const QWEN_URL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions";
 
-    // 5. PROMPT MASTER COMPLETO E RÍGIDO
+    // 5. PROMPT MASTER COMPLETO, EXTENSO E REFINADO
     const promptMaster = `
-PROMPT MESTRE — IA GERADORA DE SITES PERSONALIZADOS DE ALTA CONVERSÃO
+PROMPT MESTRE — GERADOR DE SITES DE ALTA PERFORMANCE E CONVERSÃO (2026)
 
-Você é um Engenheiro de Software Front-End Sênior, UX/UI Designer internacional e especialista em criação de sites modernos, elegantes e focados em resultados.
-Sua missão é criar um site completo em arquivo único HTML5, totalmente responsivo, profissional e visualmente impactante, utilizando rigorosamente os dados abaixo.
-
-=====================================================
-REGRA PRINCIPAL DE MONTAGEM
-=====================================================
-1. As INFORMAÇÕES OBRIGATÓRIAS devem ser utilizadas na construção das seções estruturais.
-2. As SEÇÕES OPCIONAIS só devem existir se houverem dados preenchidos no briefing abaixo. Se o dado estiver vazio ou omitido, NÃO crie a seção correspondente e NÃO invente textos falsos ou placeholders.
-3. NUNCA exiba textos de exemplo como: "Nome do serviço", "Produto aqui", "Lorem Ipsum", "Depoimento do cliente", "Sua imagem aqui".
+Você é um Engenheiro de Software Front-End Sênior e Lead Designer UI/UX. Sua missão é criar um site HTML5 completo, robusto, extenso, moderno e visualmente impecável.
 
 =====================================================
-INFORMAÇÕES OBRIGATÓRIAS DO SITE
+REGRA CRÍTICA #1: PROIBIDO USAR FOTOS UNSPLASH COMO IMAGEM DE FUNDO
+=====================================================
+- NUNCA utilize imagens de fundo do Unsplash (background-image) em seções como Hero, Sobre, Contato ou Seções Principais.
+- O design do site deve ser construído 100% com CSS moderno de alto nível: gradientes refinados, cores sólidas elegantes, sombras suaves, overlays de blur e cards com Glassmorphism.
+- As ÚNICAS fotos externas permitidas no site são os 3 pequenos avatares dos depoimentos dos clientes.
+
+=====================================================
+REGRA CRÍTICA #2: EXPANSÃO APROFUNDADA DE CONTEÚDO (SEM INVENTAR DADOS FALSOS)
+=====================================================
+- O site NÃO deve ser curto nem superficial. Desenvolva uma página extensa, detalhada e rica em conteúdo persuasivo.
+- Pegue as informações fornecidas e desdobre-as em parágrafos bem escritos, tópicos explicativos, seções de metodologia, motivos para escolher a empresa, etapas de atendimento e benefícios para o cliente.
+- NUNCA invente dados falsos como preços não informados, e-mails fictícios ou endereços que não foram fornecidos.
+
+=====================================================
+INFORMAÇÕES OBRIGATÓRIAS DO CLIENTE
 =====================================================
 - Nome da Empresa: ${nome}
 - Segmento / Área de Atuação: ${nicho}
@@ -110,14 +109,14 @@ INFORMAÇÕES OBRIGATÓRIAS DO SITE
 - WhatsApp / Telefone Principal: ${whatsappLimpo}
 
 =====================================================
-INFORMAÇÕES OPCIONAIS (USAR APENAS SE DISPONÍVEIS)
+INFORMAÇÕES OPCIONAIS (INCLUIR SOMENTE SE DISPONÍVEIS)
 =====================================================
-ESTILO VISUAL SELECIONADO: ${estilo || 'Automático/Moderno para o segmento'}
-Cor Primária: ${cor_primaria}
+ESTILO VISUAL SOLICITADO: ${estilo || 'Moderno e Profissional para o segmento'}
+Cor Primária de Destaque: ${cor_primaria}
 Cor Secundária: ${cor_secundaria}
-Link da Logo: ${link_logo ? link_logo : 'Nenhuma logo enviada (Utilizar o nome da empresa em tipografia estilizada no header)'}
+Link da Logo: ${link_logo ? link_logo : 'Nenhuma logo enviada (Exibir nome da empresa com tipografia elegante e estilizada no Header)'}
 
-IMAGENS PERSONALIZADAS:
+IMAGENS PERSONALIZADAS ENVIADAS:
 ${instrucaoImagensPersonalizadas}
 
 SERVIÇOS:
@@ -132,70 +131,79 @@ ${blocoOferta}
 GALERIA / PORTFÓLIO:
 ${blocoGaleria}
 
-CONTATO COMPLEMENTAR:
-E-mail: ${email ? email : 'Não informado (Não exibir e-mail fictício no site)'}
-Endereço: ${endereco ? endereco : 'Não informado (Não exibir endereço fictício no site)'}
-Redes Sociais Enviadas: ${Object.keys(redes_sociais).length > 0 ? JSON.stringify(redes_sociais) : 'Nenhuma rede enviada (Exibir apenas o botão de contato)'}
+CONTATO ADICIONAL:
+E-mail: ${email ? email : 'Não fornecido (Não exibir e-mail no site)'}
+Endereço: ${endereco ? endereco : 'Não fornecido (Não exibir endereço no site)'}
+Redes Sociais: ${Object.keys(redes_sociais).length > 0 ? JSON.stringify(redes_sociais) : 'Não enviadas (Exibir apenas o botão principal de atendimento)'}
 
 CONFIGURAÇÃO DO CTA PRINCIPAL:
 - Texto do Botão: "${cta_texto}"
-- Destino Selecionado: ${cta_destino}
-- Mensagem Automática / Detalhe: "${cta_detalhe}"
-(Observação: Se for WhatsApp, monte o link corretamente: https://wa.me/${whatsappLimpo}?text=${encodeURIComponent(cta_detalhe || 'Olá! Vim pelo site e gostaria de mais informações.')})
+- Destino: ${cta_destino}
+- Mensagem Automática: "${cta_detalhe}"
+(Link do WhatsApp pré-formatado: https://wa.me/${whatsappLimpo}?text=${encodeURIComponent(cta_detalhe || 'Olá! Vim pelo site e gostaria de mais informações.')})
 
 =====================================================
-REGRAS ESTRUTURAIS E DESIGN (INVIOLÁVEIS)
+ESTRUTURA DETALHADA E SEÇÕES DO SITE
 =====================================================
 
-1. HEADER:
-- Fundo fixo ou translúcido com Glassmorphic Blur.
-- Logo (se houver) ou Nome da Empresa estilizado.
-- Menu de navegação responsivo apontando APENAS para seções que REALMENTE existem no site.
-- Menu Hambúrguer funcional via JavaScript para mobile.
+1. HEADER FIXO ELEGANTE:
+- Menu com efeito Glassmorphism (blur de fundo).
+- Logo ou Nome da empresa com tipografia estilizada.
+- Links de navegação apontando exclusivamente para seções existentes.
+- Botão CTA destacado para o WhatsApp.
+- Menu Hambúrguer funcional para mobile via JavaScript.
 
-2. HERO SECTION:
-- Apresentação impactante de altíssimo nível.
-- Headline gigante, slogan, resumo persuasivo do segmento (${nicho}), badges de diferenciais e botão CTA destacado.
+2. HERO SECTION IMPACTANTE (DESIGN 100% CSS):
+- Fundo moderno em gradientes e cores com CSS puro (SEM foto Unsplash de fundo).
+- Badge de autoridade em destaque.
+- Headline gigante e persuasiva.
+- Parágrafos detalhados sobre como a empresa atende o nicho (${nicho}).
+- Botões de ação com efeitos de iluminação e hover.
 
-3. SOBRE A EMPRESA:
-- Seção institucional contando a história e diferenciais de forma elegante, dividida em cards ou colunas.
+3. SEÇÃO SOBRE E INSTITUCIONAL EXPANDIDA:
+- Desdobre a história, visão e pilares da empresa em textos ricos, bem formatados e agradáveis de ler.
+- Apresente os diferenciais (${diferenciais}) em uma grade de cards interativos com ícones do FontAwesome.
 
-4. DEPOIMENTOS — OBRIGATÓRIO (EXATAMENTE 3 DEPOIMENTOS):
-Independentemente das opções do formulário, o site DEVE conter 3 depoimentos realistas com 5 estrelas amarelas (<i class="fas fa-star text-yellow-400"></i>).
-Utilize obrigatoriamente estes 3 nomes e imagens nos depoimentos:
-  1. Nome: "Ana Clara" | Foto: https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80
-  2. Nome: "João Lucas" | Foto: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80
-  3. Nome: "Natália Oliveira" | Foto: https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80
+4. SEÇÃO "COMO FUNCIONA / ETAPAS DE ATENDIMENTO":
+- Crie um passo a passo numerado de 3 a 4 etapas explicando como o cliente é atendido desde o primeiro contato no WhatsApp até a entrega dos resultados.
 
-5. PERGUNTAS FREQUENTES (FAQ) — OBRIGATÓRIO (EXATAMENTE 8 PERGUNTAS E RESPOSTAS):
-- Crie EXATAMENTE 8 perguntas e respostas essenciais e extremamente úteis sobre o segmento (${nicho}).
-- O FAQ DEVE ser um acordeão sanfonado interativo com JavaScript (clicar no título revela/oculta a resposta suavemente).
-- As respostas DEVEM ter contraste de cor perfeito e excelente legibilidade.
+5. SEÇÃO DE SERVIÇOS / PRODUTOS / OFERTA:
+- Crie APENAS se tiverem sido fornecidos no briefing.
 
-6. SEÇÃO DE CONTATO E FOOTER:
-- Seção de contato destacada oferecendo o botão para o WhatsApp (${whatsappLimpo}) e exibindo e-mail/endereço SOMENTE se tiverem sido fornecidos.
-- Footer completo contendo: "© 2026 ${nome}. Todos os direitos reservados."
+6. DEPOIMENTOS — OBRIGATÓRIO (EXATAMENTE 3 CARDS):
+- Crie 3 cards de depoimentos com avaliação de 5 estrelas (<i class="fas fa-star text-yellow-400"></i>), aspas elegantes e depoimentos ultra-realistas.
+- Utilize rigorosamente estes 3 nomes e fotos de perfil:
+  1. "Ana Clara" | Foto: https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80
+  2. "João Lucas" | Foto: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80
+  3. "Natália Oliveira" | Foto: https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80
+
+7. FAQ REDESENHADO, LINDO E COM RESPOSTAS RICAS (EXATAMENTE 8 PERGUNTAS):
+- Crie um FAQ visualmente deslumbrante com cards bem acabados, sombras sutis, bordas arredondadas e ícones animáveis (+ / - ou seta).
+- CADA UMA DAS 8 PERGUNTAS DEVE POSSUIR UMA RESPOSTA EXTENSA, COMPLETA, DETALHADA E PERFEITAMENTE VISÍVEL DENTRO DO ACORDEÃO.
+- Escreva respostas que passem autoridade, tirem dúvidas reais sobre o nicho (${nicho}), prazos, formas de contato e processo.
+- Insira o script JavaScript que permite abrir e fechar a resposta com animação suave e transição fluida ao clicar.
+
+8. SEÇÃO DE CONTATO E FOOTER COMPLETO:
+- Bloco final de alta conversão convidando o cliente para conversar no WhatsApp (${whatsappLimpo}).
+- Exiba e-mail ou endereço SOMENTE se fornecidos.
+- Rodapé refinado: "© 2026 ${nome}. Todos os direitos reservados."
 - Botão flutuante fixo do WhatsApp no canto inferior direito da tela.
 
 =====================================================
-TECNOLOGIAS E ANIMAÇÕES
+TECNOLOGIAS E ESTILIZAÇÃO
 =====================================================
-- Arquivo único HTML5.
-- CDN do Tailwind CSS para estilização moderna.
+- Arquivo único HTML5 completo e funcional.
+- Tailwind CSS via CDN.
 - FontAwesome para ícones.
-- Google Fonts (Fontes modernas como 'Plus Jakarta Sans' ou 'Inter').
-- JavaScript puro nativo com IntersectionObserver para efeitos de Scroll Reveal (elementos surgem suavemente com fade-up ao rolar a página).
+- Fonte moderna Google Fonts ('Plus Jakarta Sans' ou 'Inter').
+- JavaScript puro para acordeão do FAQ, menu mobile e animações de entrada no scroll com IntersectionObserver.
 
 =====================================================
-REGRA FINAL DE SAÍDA (FORMATO ESTRITO)
+FORMATO EXCLUSIVO DE RESPOSTA
 =====================================================
-Retorne EXCLUSIVAMENTE o código HTML5 completo.
-NÃO inclua nenhuma explicação, introdução ou conclusão.
-NÃO utilize blocos de código tipo \`\`\`html.
-A resposta DEVE começar rigorosamente com:
-<!DOCTYPE html>
-E terminar exatamente com:
-</html>
+Retorne EXCLUSIVAMENTE o código HTML5 puro do <!DOCTYPE html> até </html>.
+NÃO use blocos Markdown de código (\`\`\`html).
+NÃO escreva nenhuma introdução, explicação ou comentário antes ou depois do código.
 `;
 
     // 6. EXECUÇÃO DA CHAMADA À IA
@@ -210,7 +218,7 @@ E terminar exatamente com:
         messages: [
           { 
             role: "system", 
-            content: "Você é um compilador de código HTML/Tailwind CSS de nível internacional. Sua função é gerar EXCLUSIVAMENTE o código HTML5 puro, sem explicações, sem texto antes ou depois e sem blocos de código Markdown." 
+            content: "Você é um compilador de código HTML/Tailwind CSS de nível internacional. Sua função é gerar EXCLUSIVAMENTE o código HTML5 puro, sem explicações, sem fotos Unsplash de fundo, sem texto antes ou depois e sem blocos de código Markdown." 
           },
           { 
             role: "user", 
@@ -230,7 +238,7 @@ E terminar exatamente com:
 
     let siteHtml = dataQwen?.choices?.[0]?.message?.content || "";
 
-    // 7. LIMPEZA RÍGIDA DE MARCAÇÕES MARKDOWN
+    // 7. LIMPEZA DE MARKDOWN
     siteHtml = siteHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
 
     if (!siteHtml || siteHtml.length < 100) {
@@ -239,7 +247,7 @@ E terminar exatamente com:
 
     // 8. NOTIFICAÇÃO VIA ROBÔ DO RAILWAY (WhatsApp)
     const URL_ROBO = 'https://bot-whatsapp-production-c379.up.railway.app/send-message';
-    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional de alta conversão foi gerado com sucesso pela nossa Inteligência Artificial!\n\nAcesse a plataforma para visualizar a prévia completa em tela cheia.`;
+    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional Premium foi gerado com sucesso pela nossa Inteligência Artificial!\n\nAcesse a plataforma para visualizar a prévia em tela cheia.`;
 
     try {
       await fetch(URL_ROBO, {
