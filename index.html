@@ -597,6 +597,7 @@
         loadingScreen.style.display = 'none';
         resultScreen.style.display = 'block';
         
+        // Link atualizado usando api.whatsapp.com com target="_blank" para evitar bloqueio no iframe
         sitePreview.srcdoc = `
           <!DOCTYPE html>
           <html lang="pt-BR">
@@ -613,7 +614,7 @@
             <p>${dados.descricao}</p>
             <h3 style="margin-top: 20px;">Nossos Serviços</h3>
             <p>${dados.servicos}</p>
-            <a href="https://wa.me/${dados.whatsapp}" class="btn">${dados.cta}</a>
+            <a href="https://api.whatsapp.com/send?phone=${dados.whatsapp}" target="_blank" class="btn">${dados.cta}</a>
           </body>
           </html>
         `;
