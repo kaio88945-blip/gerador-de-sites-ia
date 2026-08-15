@@ -43,153 +43,153 @@ export default async function handler(req, res) {
     if (imagens_personalizadas && Array.isArray(imagens_personalizadas) && imagens_personalizadas.length > 0) {
       const fotosValidas = imagens_personalizadas.filter(img => img.url && img.url.trim().length > 5);
       if (fotosValidas.length > 0) {
-        instrucaoGaleriaImagens = "O CLIENTE ENVIOU AS SEGUINTES IMAGENS PARA O SITE. CRIE UMA SEÇÃO DE GALERIA/PROTÓTIPO ELEGANTE APENAS COM ESTAS IMAGENS REALMENTE FORNECIDAS:\n" +
+        instrucaoGaleriaImagens = "O CLIENTE ENVIOU AS SEGUINTES IMAGENS PARA O SITE. CRIE UMA SEÇÃO DE GALERIA/PROTÓTIPO ELEGANTE E MODERNA APENAS COM ESTAS IMAGENS REALMENTE FORNECIDAS:\n" +
           fotosValidas.map((img, i) => `- Imagem ${i + 1}: URL: "${img.url}" | Descrição/Uso: "${img.descricao || 'Foto do Projeto'}"`).join("\n");
       }
     }
 
-    // Lógica do tema visual respeitando o formulário mas ancorada no estilo do Pyerry Diniz
+    // Lógica do tema visual respeitando a seleção do usuário
     let instrucaoEstiloVisual = "";
     if (estilo && estilo.includes("Clean")) {
-      instrucaoEstiloVisual = `ESTILO VISUAL: Clean e Claro (Minimalista).
-- Adaptar o layout do modelo para fundo claro (#ffffff ou #f8fafc), mantendo os botões arredondados e a tipografia Montserrat/Open Sans.
-- --bg-dark: #f8fafc; --bg-card: #ffffff; --text-light: #0a0a0a; --text-gray: #4b5563;`;
+      instrucaoEstiloVisual = `ESTILO VISUAL: Moderno, Minimalista & Clean.
+- Fundo do site super claro (#ffffff ou #f8fafc).
+- Cartões com fundo branco (#ffffff), bordas suaves (border: 1px solid #e2e8f0), sombras elegantes (box-shadow) e cantos arredondados (20px).
+- Textos em tons escuros e de alta legibilidade (#0f172a, #334155).`;
     } else if (estilo && estilo.includes("Colorido")) {
-      instrucaoEstiloVisual = `ESTILO VISUAL: Colorido e Vibrante.
-- Utilizar gradientes vívidos com a cor primária (${cor_primaria || '#ff3b3f'}) e secundária (${cor_secundaria || '#22c55e'}).`;
+      instrucaoEstiloVisual = `ESTILO VISUAL: Colorido, Vibrante & High-Tech.
+- Gradientes ultra-modernos utilizando a cor primária (${cor_primaria || '#6366f1'}) e secundária (${cor_secundaria || '#22c55e'}).
+- Cards com iluminação interna, badges e botões chamativos.`;
+    } else if (estilo && estilo.includes("Elegante")) {
+      instrucaoEstiloVisual = `ESTILO VISUAL: Elegante, Luxuoso e Premium.
+- Fundo preto sofisticado (#05070c) com acentos dourados e iluminação ambiente de fundo.
+- Bordas finas metálicas, sombras profundas e estéticas refinadas.`;
     } else {
-      instrucaoEstiloVisual = `ESTILO VISUAL: Dark Mode Luxo Exato do Modelo Pyerry Diniz.
-- Utilizar exatamente as cores e CSS do site de referência:
-  --primary: ${cor_primaria || '#ff3b3f'};
-  --bg-dark: #0a0a0a;
-  --bg-card: #161616;
-  --text-light: #ffffff;
-  --text-gray: #b0b0b0;`;
+      instrucaoEstiloVisual = `ESTILO VISUAL: Ultra Modern Dark Mode (Padrão SaaS & Startup Top Global).
+- Fundo escuro luxuoso (#090d16) com efeitos de iluminação radial no background.
+- Cards Glassmorphism (background: rgba(17, 24, 39, 0.7), backdrop-filter: blur(16px), border: 1px solid rgba(255, 255, 255, 0.08)).`;
     }
 
-    // PROMPT MASTER BASEADO NO HTML REAL DO PYERRY DINIZ
+    // PROMPT MASTER ULTRAPROFISSIONAL E MODERNO
     const promptMaster = `
-Você é um Engenheiro de Software Front-end e Web Designer Sênior de nível internacional.
-Sua missão é criar o código HTML5 completo de uma landing page de altíssima qualidade tomando como REFERÊNCIA DIRETA E TÉCNICA O CÓDIGO E LAYOUT DO SEGUINTE SITE:
+Você é um Diretor de Arte, UI/UX Designer e Engenheiro Front-End Sênior de nível internacional.
+Sua missão é criar o código HTML5 completo de uma landing page EXTRAORDINÁRIA, digna de grandes startups e agências globais de alta conversão.
 
 ${instrucaoEstiloVisual}
 
-ESTRUTURA TÉCNICA E CSS OBRIGATÓRIA (INSPIRADA NO CÓDIGO DO SITE DE REFERÊNCIA):
-O HTML DEVE ser entregue completo, sem erros, iniciando obrigatoriamente em:
+DIRETRIZES RÍGIDAS DE DESIGN & CÓDIGO:
+1. DESIGN MODERNO DE ALTO IMPACTO:
+   - Layout fluido, espaçoso, elegante e 100% responsivo para celular, tablet e computador.
+   - Tipografia ultra-moderna 'Plus Jakarta Sans' do Google Fonts.
+   - Headlines com gradientes de texto marcantes e badges de autoridade estilizados.
+   - Cards com cantos bem arredondados (border-radius: 20px ou 24px), hover suave (transform: translateY(-5px); transition: all 0.3s ease;).
+   - Botões estilo Pill (border-radius: 50px) com brilho (glow), sombra e texto em caixa alta/negrito.
+
+2. CÓDIGO HTML5 PONTUAL:
+O HTML DEVE iniciar obrigatoriamente com:
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${nome || 'Landing Page Pro'}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
   <style>
-    :root {
-      --primary: ${cor_primaria || '#ff3b3f'};
-      --primary-dark: #d32f2f;
-      --bg-dark: #0a0a0a;
-      --bg-card: #161616;
-      --text-light: #ffffff;
-      --text-gray: #b0b0b0;
-      --font-main: 'Open Sans', sans-serif;
-      --font-heading: 'Montserrat', sans-serif;
-      --transition: all 0.3s ease;
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+    html { scroll-behavior: smooth; }
+    .btn-gradient {
+      background: linear-gradient(135deg, ${cor_primaria || '#6366f1'}, ${cor_secundaria || '#22c55e'});
+      transition: all 0.3s ease;
     }
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html { scroll-behavior: smooth; font-size: 16px; overflow-x: hidden; }
-    body { background-color: var(--bg-dark); color: var(--text-light); font-family: var(--font-main); line-height: 1.6; }
-    a { text-decoration: none; color: inherit; transition: var(--transition); }
-    ul { list-style: none; }
-    h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; }
-    .highlight { color: var(--primary); }
-    .btn { display: inline-block; padding: 15px 35px; background-color: var(--primary); color: white; font-family: var(--font-heading); font-weight: 700; text-transform: uppercase; border-radius: 50px; border: 2px solid transparent; cursor: pointer; transition: var(--transition); text-align: center; }
-    .btn:hover { background-color: transparent; border-color: var(--primary); color: var(--primary); transform: translateY(-3px); }
-    .section-title { text-align: center; font-size: 2.5rem; margin-bottom: 3rem; position: relative; padding-bottom: 15px; }
-    .section-title::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background-color: var(--primary); }
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; }
-    section { padding: 90px 0; }
-    /* Estilos de Header, Cards, Depoimentos e FAQ no padrão da referência */
-    header { position: fixed; top: 0; width: 100%; background-color: rgba(10, 10, 10, 0.85); backdrop-filter: blur(10px); z-index: 1000; border-bottom: 1px solid #222; }
-    .plano-card { background-color: var(--bg-card); padding: 40px 30px; border-radius: 15px; border: 2px solid #222; transition: var(--transition); position: relative; display: flex; flex-direction: column; justify-content: space-between; }
-    .plano-card:hover { border-color: var(--primary); transform: scale(1.03); }
-    .popular-badge { position: absolute; top: 20px; right: -35px; background-color: var(--primary); color: white; padding: 5px 40px; transform: rotate(45deg); font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-    .testi-card { background-color: var(--bg-card); padding: 30px; border-radius: 10px; position: relative; border: 1px solid #222; }
-    .testi-card i.quote-icon { position: absolute; top: 20px; right: 20px; font-size: 2rem; color: rgba(255,59,63,0.2); }
-    .faq-item { background-color: var(--bg-dark); margin-bottom: 15px; border-radius: 5px; overflow: hidden; border: 1px solid #222; }
-    .faq-question { padding: 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-family: var(--font-heading); font-weight: 600; }
-    .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; padding: 0 20px; color: var(--text-gray); font-size: 0.95rem; }
-    .faq-item.active .faq-answer { padding: 0 20px 20px 20px; max-height: 300px; }
-    .faq-item.active .faq-icon { transform: rotate(180deg); }
+    .btn-gradient:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    }
+    .text-gradient {
+      background: linear-gradient(135deg, #ffffff 30%, ${cor_primaria || '#818cf8'});
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
   </style>
 </head>
 
 DADOS DO CLIENTE RECEBIDOS DO FORMULÁRIO:
-- Nome/Marca: ${nome || 'Empresa'}
-- Segmento/Nicho: ${nicho || 'Serviços'}
-- Descrição/História: ${descricao || 'Ajudando clientes com excelência e profissionalismo.'}
+- Nome/Marca: ${nome || 'Sua Empresa'}
+- Segmento/Nicho: ${nicho || 'Serviços Profissionais'}
+- Descrição/História: ${descricao || 'Sua solução completa com foco em alta performance e resultados reais.'}
 - Slogan: ${slogan || ''}
 - Público-alvo: ${publico_alvo || ''}
 - Diferenciais: ${diferenciais || ''}
-- Cor Primária: ${cor_primaria || '#ff3b3f'}
+- Cor Primária: ${cor_primaria || '#6366f1'}
 - Cor Secundária: ${cor_secundaria || '#22c55e'}
-- Botão CTA: "${cta_texto || 'Solicitar Atendimento'}"
+- Botão CTA: "${cta_texto || 'Falar no WhatsApp'}"
 - WhatsApp do Botão: ${numeroLimpo}
 
 INSTRUÇÃO DE IMAGENS PERSONALIZADAS:
 ${instrucaoGaleriaImagens}
 
-DEPOIMENTOS (NOMES E FOTOS OBRIGATÓRIAS):
-Crie exatamente 3 cards de depoimentos baseados no layout do Pyerry Diniz com aspas em marca d'água (<i class="fas fa-quote-right quote-icon"></i>).
-Utilize obrigatoriamente estes 3 nomes e fotos de perfil:
-1. Nome "Ana Clara" | Foto: https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80
-2. Nome "João Lucas" | Foto: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80
-3. Nome "Natália Oliveira" | Foto: https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80
-Cada card deve conter o nome em negrito, a imagem arredondada com borda na cor primária, 5 estrelas amarelas (<i class="fas fa-star text-yellow-400"></i>) e o depoimento realista.
+DEPOIMENTOS — REGRA STRICT DE NOMES E ESTRUTURA:
+Crie exatamente 3 cards de depoimentos extremamente profissionais.
+Os nomes e fotos dos clientes DEVEM SER EXATAMENTE ESTES:
+1. "Ana Clara" | Foto: https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80
+2. "João Lucas" | Foto: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80
+3. "Natália Oliveira" | Foto: https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80
 
-FAQ (8 PERGUNTAS COM RESPOSTAS DETALHADAS E VISÍVEIS):
-- Crie a seção de FAQ com EXATAMENTE 8 perguntas frequentes.
-- CADA PERGUNTA DEVE CONTER UMA RESPOSTA DETALHADA E PERFEITAMENTE VISÍVEL DENTRO DA DIV .faq-answer.
-- Aplique o script JS para que o clique na .faq-question adicione/remova a classe 'active' no .faq-item, expandindo e recolhendo a resposta suavemente.
+Cada card DEVE conter:
+- Foto de perfil circular com borda brilhante na cor primária (${cor_primaria || '#6366f1'}).
+- O NOME EXATO em negrito destacado.
+- Avaliação de 5 estrelas amarelas (<i class="fas fa-star text-yellow-400"></i>).
+- Depoimento hiper-realista e convincente focado no segmento (${nicho}).
+
+FAQ (PERGUNTAS FREQUENTES COM RESPOSTAS LÚCIDAS E EXPAN SÍVEIS):
+- Crie uma seção de FAQ contendo 6 a 8 perguntas frequentes essenciais sobre o nicho (${nicho}).
+- CADA PERGUNTA DEVE CONTER UMA RESPOSTA DETALHADA, CLARA E TOTALMENTE LEGÍVEL.
+- Cada item deve possuir um botão com a classe .faq-btn e a resposta em uma div com .faq-content.hidden.
+- Crie um script JS funcional ao final da página que abre e fecha o conteúdo da resposta ao clicar de forma fluida.
 
 RODAPÉ / FOOTER (ANO 2026):
-- O rodapé DEVE conter obrigatoriamente os direitos autorais com o ano de 2026:
-  "&copy; 2026 ${nome || 'Empresa'}. Todos os direitos reservados."
+- Inclua um rodapé profissional e elegante com os direitos autorais contendo EXATAMENTE O ANO DE 2026:
+  "© 2026 ${nome || 'Empresa'}. Todos os direitos reservados."
+- Inclua um botão flutuante do WhatsApp no canto inferior direito da tela.
 
-ESTRUTURA DAS SEÇÕES NA PÁGINA:
-1. HEADER FIXO com efeito blur, logo/nome, navegação rápida e botão CTA para WhatsApp.
-2. HERO SECTION de impacto com título grande, subhead persuasivo e botão principal estilizado no padrão pill (border-radius: 50px).
-3. SEÇÃO SOBRE MIM / EMPRESA com estatísticas em Grid (Anos de Experiência, Pacientes/Clientes Atendidos, Satisfação).
-4. SEÇÃO DE SERVIÇOS / PLANOS formatada em Grid de Cards com bordas elegantes (#222), badge em destaque ("Mais Escolhido") no card principal e botão CTA do WhatsApp.
-5. SEÇÃO BENEFÍCIOS E DIFERENCIAIS.
-6. GALERIA DE IMAGENS PERSONALIZADAS (Apenas se enviadas no briefing. Se não houver, ignore e não crie quadros vazios).
-7. SEÇÃO DE DEPOIMENTOS (Ana Clara, João Lucas e Natália Oliveira).
-8. SEÇÃO FAQ (8 perguntas e respostas com funcionalidade acordeão).
-9. CTA FINAL impactante com botão direto do WhatsApp.
-10. FOOTER completo com © 2026 e botão flutuante fixo do WhatsApp no canto da tela.
+ESTRUTURA DAS SEÇÕES DA LANDING PAGE:
+1. HEADER FIXO com efeito Blur Glassmorphism, Logo/Nome em destaque e botão CTA para WhatsApp.
+2. HERO SECTION impactante com Badge em destaque, Headline com texto gradiente gigante, subtítulo persuasivo e botões de ação.
+3. SEÇÃO NÚMEROS / ESTATÍSTICAS (Ex: +500 Clientes Atendidos, 99% Satisfação, +5 Anos de Tradição).
+4. SEÇÃO SOBRE A EMPRESA com história, missão e diferenciais bem diagramados.
+5. SEÇÃO DE SERVIÇOS E SOLUÇÕES em Grid de Cards modernos com ícones FontAwesome e animações no hover.
+6. SEÇÃO BENEFÍCIOS E DIFERENCIAIS com checkmarks estilizados.
+7. SEÇÃO "COMO FUNCIONA" (3 a 5 etapas visuais explicativas).
+8. GALERIA DE IMAGENS PERSONALIZADAS (Somente se fornecidas no briefing. Caso contrário, não crie a seção nem quadros vazios).
+9. SEÇÃO DE DEPOIMENTOS (Os 3 cards obrigatórios: Ana Clara, João Lucas e Natália Oliveira com 5 estrelas).
+10. SEÇÃO FAQ COMPLETA (Perguntas + Respostas detalhadas com acordeão expansível).
+11. CTA FINAL persuasivo direcionando para o WhatsApp.
+12. FOOTER completo com © 2026 e botão fixo flutuante do WhatsApp.
 
-SCRIPTS NO FINAL DA PÁGINA (ANTES DO </body>):
-  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+SCRIPTS E ANIMAÇÕES (ANTES DE FECHAR O </body>):
+  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
   <script>
-    AOS.init({ duration: 800, easing: 'ease-in-out', once: true });
-
-    // Script do FAQ Acordeão
-    const faqItems = document.querySelectorAll('.faq-item');
-    faqItems.forEach(item => {
-      const question = item.querySelector('.faq-question');
-      if (question) {
-        question.addEventListener('click', () => {
-          faqItems.forEach(otherItem => {
-            if (otherItem !== item) {
-              otherItem.classList.remove('active');
+    AOS.init({ duration: 800, once: true });
+    
+    // Script Interativo do FAQ
+    document.addEventListener('DOMContentLoaded', () => {
+      const faqButtons = document.querySelectorAll('.faq-btn');
+      faqButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const content = btn.nextElementSibling;
+          const icon = btn.querySelector('.faq-icon');
+          if (content) {
+            content.classList.toggle('hidden');
+            if (icon) {
+              icon.classList.toggle('rotate-180');
             }
-          });
-          item.classList.toggle('active');
+          }
         });
-      }
+      });
     });
   </script>
 
@@ -209,7 +209,7 @@ Não utilize Markdown nem blocos de código tipo \`\`\`html.
       body: JSON.stringify({
         model: "qwen-max",
         messages: [
-          { role: "system", content: "Você é um compilador de código HTML/CSS de nível internacional. Retorne EXCLUSIVAMENTE o código HTML5 puro funcional idêntico à estrutura CSS e visual do modelo Pyerry Diniz, ano 2026 no rodapé, depoimentos com Ana Clara, João Lucas e Natália Oliveira, FAQ expansível funcional, sem markdown e sem caixas de código." },
+          { role: "system", content: "Você é um compilador de código HTML/Tailwind de nível internacional. Retorne EXCLUSIVAMENTE o código HTML5 puro funcional com design ultra-moderno, ano 2026 no rodapé, depoimentos de Ana Clara, João Lucas e Natália Oliveira, FAQ expansível sem markdown." },
           { role: "user", content: promptMaster }
         ],
         temperature: 0.5
@@ -234,7 +234,7 @@ Não utilize Markdown nem blocos de código tipo \`\`\`html.
 
     // Notificação do Robô no Railway
     const URL_ROBO = 'https://bot-whatsapp-production-c379.up.railway.app/send-message';
-    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional Premium de alta conversão foi gerado com sucesso!\n\nAcesse a plataforma para visualizar a prévia completa.`;
+    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional Premium foi gerado com sucesso!\n\nAcesse a plataforma para visualizar a prévia completa em tela cheia.`;
 
     try {
       await fetch(URL_ROBO, {
