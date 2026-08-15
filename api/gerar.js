@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // Configurações de CORS
+  // 1. Configurações Globais de CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -8,198 +8,197 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Método não permitido' });
 
   try {
-    const dados = req.body;
-    const { 
-      nome, 
-      whatsapp, 
-      nicho, 
-      descricao, 
-      slogan, 
-      publico_alvo, 
-      diferenciais, 
-      estilo, 
-      cor_primaria, 
-      cor_secundaria, 
-      cta_texto, 
-      imagens_personalizadas 
-    } = dados;
+    const dados = req.body || {};
 
-    if (!whatsapp) {
+    // 2. TRATAMENTO DAS INFORMAÇÕES OBRIGATÓRIAS
+    const nome = dados.nome || 'Sua Empresa';
+    const nicho = dados.nicho || 'Serviços Profissionais';
+    const slogan = dados.slogan || '';
+    const descricao = dados.descricao || 'Oferecemos as melhores soluções e serviços com excelência e compromisso com o cliente.';
+    const publico_alvo = dados.publico_alvo || '';
+    const diferenciais = dados.diferenciais || '';
+    
+    // Tratamento estrito do número de WhatsApp
+    let whatsappLimpo = String(dados.whatsapp || '').replace(/\D/g, '');
+    if (whatsappLimpo && !whatsappLimpo.startsWith('55')) {
+      whatsappLimpo = '55' + whatsappLimpo;
+    }
+
+    if (!whatsappLimpo) {
       return res.status(400).json({ success: false, error: 'O número de WhatsApp é obrigatório!' });
     }
 
-    // Tratamento do número de WhatsApp
-    let numeroLimpo = String(whatsapp).replace(/\D/g, '');
-    if (!numeroLimpo.startsWith('55')) {
-      numeroLimpo = '55' + numeroLimpo;
-    }
+    // 3. TRATAMENTO DAS INFORMAÇÕES OPCIONAIS (Montagem dos blocos condicionais)
+    
+    // Visual / Identidade
+    const estilo = dados.estilo || '';
+    const cor_primaria = dados.cor_primaria || '#6366f1';
+    const cor_secundaria = dados.cor_secundaria || '#22c55e';
+    const link_logo = dados.link_logo || '';
 
-    // Configuração da API do Qwen (DashScope)
-    const QWEN_API_KEY = process.env.QWEN_API_KEY || "sk-ws-H.DMEDIDR.A3e2.MEQCIBYvIBLMRQFijb7-GkusJzYzSbGUbSgRRNT_OFjGY2A3AiBvQiqyvky59UjJrwnpj6LhN6wSYGUfT6wqE3hnFSyhWQ";
-    const QWEN_URL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions";
-
-    // Tratamento condicional de imagens do briefing
-    let instrucaoGaleriaImagens = "O CLIENTE NÃO ENVIOU IMAGENS PERSONALIZADAS. NUNCA CRIE UMA GALERIA OU QUADROS DE IMAGEM VAZIOS/SKELETONS NA PÁGINA. IGNORE ESSA SEÇÃO COMPLETAMENTE.";
-    if (imagens_personalizadas && Array.isArray(imagens_personalizadas) && imagens_personalizadas.length > 0) {
-      const fotosValidas = imagens_personalizadas.filter(img => img.url && img.url.trim().length > 5);
-      if (fotosValidas.length > 0) {
-        instrucaoGaleriaImagens = "O CLIENTE ENVIOU AS SEGUINTES IMAGENS PARA O SITE. CRIE UMA SEÇÃO DE GALERIA/PROTÓTIPO ELEGANTE E MODERNA APENAS COM ESTAS IMAGENS REALMENTE FORNECIDAS:\n" +
-          fotosValidas.map((img, i) => `- Imagem ${i + 1}: URL: "${img.url}" | Descrição/Uso: "${img.descricao || 'Foto do Projeto'}"`).join("\n");
+    // Imagens Personalizadas
+    let instrucaoImagensPersonalizadas = "Nenhuma imagem personalizada foi enviada pelo cliente. Não crie quadros de galeria vazios ou placeholders de foto sem sentido.";
+    if (dados.imagens_personalizadas && Array.isArray(dados.imagens_personalizadas) && dados.imagens_personalizadas.length > 0) {
+      const imgsValidas = dados.imagens_personalizadas.filter(img => img.url && img.url.trim().length > 5);
+      if (imgsValidas.length > 0) {
+        instrucaoImagensPersonalizadas = "O cliente enviou as seguintes imagens personalizadas com descrições. Posicione cada uma na seção mais adequada conforme a intenção:\n" +
+          imgsValidas.map((img, i) => `- Imagem ${i + 1}: URL="${img.url}" | Descrição="${img.descricao || 'Foto institucional/produto'}"`).join("\n");
       }
     }
 
-    // Lógica do tema visual respeitando a seleção do usuário
-    let instrucaoEstiloVisual = "";
-    if (estilo && estilo.includes("Clean")) {
-      instrucaoEstiloVisual = `ESTILO VISUAL: Moderno, Minimalista & Clean.
-- Fundo do site super claro (#ffffff ou #f8fafc).
-- Cartões com fundo branco (#ffffff), bordas suaves (border: 1px solid #e2e8f0), sombras elegantes (box-shadow) e cantos arredondados (20px).
-- Textos em tons escuros e de alta legibilidade (#0f172a, #334155).`;
-    } else if (estilo && estilo.includes("Colorido")) {
-      instrucaoEstiloVisual = `ESTILO VISUAL: Colorido, Vibrante & High-Tech.
-- Gradientes ultra-modernos utilizando a cor primária (${cor_primaria || '#6366f1'}) e secundária (${cor_secundaria || '#22c55e'}).
-- Cards com iluminação interna, badges e botões chamativos.`;
-    } else if (estilo && estilo.includes("Elegante")) {
-      instrucaoEstiloVisual = `ESTILO VISUAL: Elegante, Luxuoso e Premium.
-- Fundo preto sofisticado (#05070c) com acentos dourados e iluminação ambiente de fundo.
-- Bordas finas metálicas, sombras profundas e estéticas refinadas.`;
-    } else {
-      instrucaoEstiloVisual = `ESTILO VISUAL: Ultra Modern Dark Mode (Padrão SaaS & Startup Top Global).
-- Fundo escuro luxuoso (#090d16) com efeitos de iluminação radial no background.
-- Cards Glassmorphism (background: rgba(17, 24, 39, 0.7), backdrop-filter: blur(16px), border: 1px solid rgba(255, 255, 255, 0.08)).`;
+    // Seção Opcional: Serviços
+    let blocoServicos = "O cliente NÃO enviou uma lista de serviços. NÃO crie a seção de serviços no site.";
+    if (dados.servicos && Array.isArray(dados.servicos) && dados.servicos.length > 0) {
+      blocoServicos = "CRIE A SEÇÃO DE SERVIÇOS com os seguintes itens fornecidos:\n" + JSON.stringify(dados.servicos, null, 2);
     }
 
-    // PROMPT MASTER ULTRAPROFISSIONAL E MODERNO
+    // Seção Opcional: Produtos
+    let blocoProdutos = "O cliente NÃO enviou uma lista de produtos. NÃO crie a seção de produtos no site.";
+    if (dados.produtos && Array.isArray(dados.produtos) && dados.produtos.length > 0) {
+      blocoProdutos = "CRIE A SEÇÃO DE PRODUTOS com os seguintes itens fornecidos:\n" + JSON.stringify(dados.produtos, null, 2);
+    }
+
+    // Seção Opcional: Oferta Especial
+    let blocoOferta = "O cliente NÃO enviou uma oferta especial. NÃO crie a seção de oferta/promoção no site.";
+    if (dados.oferta && (dados.oferta.titulo || dados.oferta_titulo)) {
+      blocoOferta = "CRIE UMA SEÇÃO DE OFERTA/PROMOÇÃO DE ALTA CONVERSÃO com os seguintes dados:\n" + JSON.stringify(dados.oferta, null, 2);
+    }
+
+    // Seção Opcional: Galeria
+    let blocoGaleria = "O cliente NÃO forneceu link de galeria/portfólio. NÃO crie a seção de galeria.";
+    if (dados.link_galeria && dados.link_galeria.trim().length > 5) {
+      blocoGaleria = `CRIE A SEÇÃO DE GALERIA/PORTFÓLIO apontando ou destacando este recurso: ${dados.link_galeria}`;
+    }
+
+    // Informações de Contato Adicionais
+    const email = dados.email || '';
+    const endereco = dados.endereco || '';
+    const redes_sociais = dados.redes_sociais || {};
+
+    // Configuração do CTA Principal
+    const cta_texto = dados.cta_texto || 'Falar no WhatsApp';
+    const cta_destino = dados.cta_destino || 'whatsapp';
+    const cta_detalhe = dados.cta_detalhe || '';
+
+    // 4. CONFIGURAÇÃO DA IA (Qwen / DashScope)
+    const QWEN_API_KEY = process.env.QWEN_API_KEY || "sk-ws-H.DMEDIDR.A3e2.MEQCIBYvIBLMRQFijb7-GkusJzYzSbGUbSgRRNT_OFjGY2A3AiBvQiqyvky59UjJrwnpj6LhN6wSYGUfT6wqE3hnFSyhWQ";
+    const QWEN_URL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions";
+
+    // 5. PROMPT MASTER COMPLETO E RÍGIDO
     const promptMaster = `
-Você é um Diretor de Arte, UI/UX Designer e Engenheiro Front-End Sênior de nível internacional.
-Sua missão é criar o código HTML5 completo de uma landing page EXTRAORDINÁRIA, digna de grandes startups e agências globais de alta conversão.
+PROMPT MESTRE — IA GERADORA DE SITES PERSONALIZADOS DE ALTA CONVERSÃO
 
-${instrucaoEstiloVisual}
+Você é um Engenheiro de Software Front-End Sênior, UX/UI Designer internacional e especialista em criação de sites modernos, elegantes e focados em resultados.
+Sua missão é criar um site completo em arquivo único HTML5, totalmente responsivo, profissional e visualmente impactante, utilizando rigorosamente os dados abaixo.
 
-DIRETRIZES RÍGIDAS DE DESIGN & CÓDIGO:
-1. DESIGN MODERNO DE ALTO IMPACTO:
-   - Layout fluido, espaçoso, elegante e 100% responsivo para celular, tablet e computador.
-   - Tipografia ultra-moderna 'Plus Jakarta Sans' do Google Fonts.
-   - Headlines com gradientes de texto marcantes e badges de autoridade estilizados.
-   - Cards com cantos bem arredondados (border-radius: 20px ou 24px), hover suave (transform: translateY(-5px); transition: all 0.3s ease;).
-   - Botões estilo Pill (border-radius: 50px) com brilho (glow), sombra e texto em caixa alta/negrito.
+=====================================================
+REGRA PRINCIPAL DE MONTAGEM
+=====================================================
+1. As INFORMAÇÕES OBRIGATÓRIAS devem ser utilizadas na construção das seções estruturais.
+2. As SEÇÕES OPCIONAIS só devem existir se houverem dados preenchidos no briefing abaixo. Se o dado estiver vazio ou omitido, NÃO crie a seção correspondente e NÃO invente textos falsos ou placeholders.
+3. NUNCA exiba textos de exemplo como: "Nome do serviço", "Produto aqui", "Lorem Ipsum", "Depoimento do cliente", "Sua imagem aqui".
 
-2. CÓDIGO HTML5 PONTUAL:
-O HTML DEVE iniciar obrigatoriamente com:
+=====================================================
+INFORMAÇÕES OBRIGATÓRIAS DO SITE
+=====================================================
+- Nome da Empresa: ${nome}
+- Segmento / Área de Atuação: ${nicho}
+- Slogan / Frase de Impacto: ${slogan}
+- Descrição e História: ${descricao}
+- Público-Alvo: ${publico_alvo}
+- Principais Diferenciais: ${diferenciais}
+- WhatsApp / Telefone Principal: ${whatsappLimpo}
+
+=====================================================
+INFORMAÇÕES OPCIONAIS (USAR APENAS SE DISPONÍVEIS)
+=====================================================
+ESTILO VISUAL SELECIONADO: ${estilo || 'Automático/Moderno para o segmento'}
+Cor Primária: ${cor_primaria}
+Cor Secundária: ${cor_secundaria}
+Link da Logo: ${link_logo ? link_logo : 'Nenhuma logo enviada (Utilizar o nome da empresa em tipografia estilizada no header)'}
+
+IMAGENS PERSONALIZADAS:
+${instrucaoImagensPersonalizadas}
+
+SERVIÇOS:
+${blocoServicos}
+
+PRODUTOS:
+${blocoProdutos}
+
+OFERTA ESPECIAL:
+${blocoOferta}
+
+GALERIA / PORTFÓLIO:
+${blocoGaleria}
+
+CONTATO COMPLEMENTAR:
+E-mail: ${email ? email : 'Não informado (Não exibir e-mail fictício no site)'}
+Endereço: ${endereco ? endereco : 'Não informado (Não exibir endereço fictício no site)'}
+Redes Sociais Enviadas: ${Object.keys(redes_sociais).length > 0 ? JSON.stringify(redes_sociais) : 'Nenhuma rede enviada (Exibir apenas o botão de contato)'}
+
+CONFIGURAÇÃO DO CTA PRINCIPAL:
+- Texto do Botão: "${cta_texto}"
+- Destino Selecionado: ${cta_destino}
+- Mensagem Automática / Detalhe: "${cta_detalhe}"
+(Observação: Se for WhatsApp, monte o link corretamente: https://wa.me/${whatsappLimpo}?text=${encodeURIComponent(cta_detalhe || 'Olá! Vim pelo site e gostaria de mais informações.')})
+
+=====================================================
+REGRAS ESTRUTURAIS E DESIGN (INVIOLÁVEIS)
+=====================================================
+
+1. HEADER:
+- Fundo fixo ou translúcido com Glassmorphic Blur.
+- Logo (se houver) ou Nome da Empresa estilizado.
+- Menu de navegação responsivo apontando APENAS para seções que REALMENTE existem no site.
+- Menu Hambúrguer funcional via JavaScript para mobile.
+
+2. HERO SECTION:
+- Apresentação impactante de altíssimo nível.
+- Headline gigante, slogan, resumo persuasivo do segmento (${nicho}), badges de diferenciais e botão CTA destacado.
+
+3. SOBRE A EMPRESA:
+- Seção institucional contando a história e diferenciais de forma elegante, dividida em cards ou colunas.
+
+4. DEPOIMENTOS — OBRIGATÓRIO (EXATAMENTE 3 DEPOIMENTOS):
+Independentemente das opções do formulário, o site DEVE conter 3 depoimentos realistas com 5 estrelas amarelas (<i class="fas fa-star text-yellow-400"></i>).
+Utilize obrigatoriamente estes 3 nomes e imagens nos depoimentos:
+  1. Nome: "Ana Clara" | Foto: https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80
+  2. Nome: "João Lucas" | Foto: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80
+  3. Nome: "Natália Oliveira" | Foto: https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80
+
+5. PERGUNTAS FREQUENTES (FAQ) — OBRIGATÓRIO (EXATAMENTE 8 PERGUNTAS E RESPOSTAS):
+- Crie EXATAMENTE 8 perguntas e respostas essenciais e extremamente úteis sobre o segmento (${nicho}).
+- O FAQ DEVE ser um acordeão sanfonado interativo com JavaScript (clicar no título revela/oculta a resposta suavemente).
+- As respostas DEVEM ter contraste de cor perfeito e excelente legibilidade.
+
+6. SEÇÃO DE CONTATO E FOOTER:
+- Seção de contato destacada oferecendo o botão para o WhatsApp (${whatsappLimpo}) e exibindo e-mail/endereço SOMENTE se tiverem sido fornecidos.
+- Footer completo contendo: "© 2026 ${nome}. Todos os direitos reservados."
+- Botão flutuante fixo do WhatsApp no canto inferior direito da tela.
+
+=====================================================
+TECNOLOGIAS E ANIMAÇÕES
+=====================================================
+- Arquivo único HTML5.
+- CDN do Tailwind CSS para estilização moderna.
+- FontAwesome para ícones.
+- Google Fonts (Fontes modernas como 'Plus Jakarta Sans' ou 'Inter').
+- JavaScript puro nativo com IntersectionObserver para efeitos de Scroll Reveal (elementos surgem suavemente com fade-up ao rolar a página).
+
+=====================================================
+REGRA FINAL DE SAÍDA (FORMATO ESTRITO)
+=====================================================
+Retorne EXCLUSIVAMENTE o código HTML5 completo.
+NÃO inclua nenhuma explicação, introdução ou conclusão.
+NÃO utilize blocos de código tipo \`\`\`html.
+A resposta DEVE começar rigorosamente com:
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${nome || 'Landing Page Pro'}</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
-    html { scroll-behavior: smooth; }
-    .btn-gradient {
-      background: linear-gradient(135deg, ${cor_primaria || '#6366f1'}, ${cor_secundaria || '#22c55e'});
-      transition: all 0.3s ease;
-    }
-    .btn-gradient:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
-    }
-    .text-gradient {
-      background: linear-gradient(135deg, #ffffff 30%, ${cor_primaria || '#818cf8'});
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-  </style>
-</head>
-
-DADOS DO CLIENTE RECEBIDOS DO FORMULÁRIO:
-- Nome/Marca: ${nome || 'Sua Empresa'}
-- Segmento/Nicho: ${nicho || 'Serviços Profissionais'}
-- Descrição/História: ${descricao || 'Sua solução completa com foco em alta performance e resultados reais.'}
-- Slogan: ${slogan || ''}
-- Público-alvo: ${publico_alvo || ''}
-- Diferenciais: ${diferenciais || ''}
-- Cor Primária: ${cor_primaria || '#6366f1'}
-- Cor Secundária: ${cor_secundaria || '#22c55e'}
-- Botão CTA: "${cta_texto || 'Falar no WhatsApp'}"
-- WhatsApp do Botão: ${numeroLimpo}
-
-INSTRUÇÃO DE IMAGENS PERSONALIZADAS:
-${instrucaoGaleriaImagens}
-
-DEPOIMENTOS — REGRA STRICT DE NOMES E ESTRUTURA:
-Crie exatamente 3 cards de depoimentos extremamente profissionais.
-Os nomes e fotos dos clientes DEVEM SER EXATAMENTE ESTES:
-1. "Ana Clara" | Foto: https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80
-2. "João Lucas" | Foto: https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80
-3. "Natália Oliveira" | Foto: https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80
-
-Cada card DEVE conter:
-- Foto de perfil circular com borda brilhante na cor primária (${cor_primaria || '#6366f1'}).
-- O NOME EXATO em negrito destacado.
-- Avaliação de 5 estrelas amarelas (<i class="fas fa-star text-yellow-400"></i>).
-- Depoimento hiper-realista e convincente focado no segmento (${nicho}).
-
-FAQ (PERGUNTAS FREQUENTES COM RESPOSTAS LÚCIDAS E EXPAN SÍVEIS):
-- Crie uma seção de FAQ contendo 6 a 8 perguntas frequentes essenciais sobre o nicho (${nicho}).
-- CADA PERGUNTA DEVE CONTER UMA RESPOSTA DETALHADA, CLARA E TOTALMENTE LEGÍVEL.
-- Cada item deve possuir um botão com a classe .faq-btn e a resposta em uma div com .faq-content.hidden.
-- Crie um script JS funcional ao final da página que abre e fecha o conteúdo da resposta ao clicar de forma fluida.
-
-RODAPÉ / FOOTER (ANO 2026):
-- Inclua um rodapé profissional e elegante com os direitos autorais contendo EXATAMENTE O ANO DE 2026:
-  "© 2026 ${nome || 'Empresa'}. Todos os direitos reservados."
-- Inclua um botão flutuante do WhatsApp no canto inferior direito da tela.
-
-ESTRUTURA DAS SEÇÕES DA LANDING PAGE:
-1. HEADER FIXO com efeito Blur Glassmorphism, Logo/Nome em destaque e botão CTA para WhatsApp.
-2. HERO SECTION impactante com Badge em destaque, Headline com texto gradiente gigante, subtítulo persuasivo e botões de ação.
-3. SEÇÃO NÚMEROS / ESTATÍSTICAS (Ex: +500 Clientes Atendidos, 99% Satisfação, +5 Anos de Tradição).
-4. SEÇÃO SOBRE A EMPRESA com história, missão e diferenciais bem diagramados.
-5. SEÇÃO DE SERVIÇOS E SOLUÇÕES em Grid de Cards modernos com ícones FontAwesome e animações no hover.
-6. SEÇÃO BENEFÍCIOS E DIFERENCIAIS com checkmarks estilizados.
-7. SEÇÃO "COMO FUNCIONA" (3 a 5 etapas visuais explicativas).
-8. GALERIA DE IMAGENS PERSONALIZADAS (Somente se fornecidas no briefing. Caso contrário, não crie a seção nem quadros vazios).
-9. SEÇÃO DE DEPOIMENTOS (Os 3 cards obrigatórios: Ana Clara, João Lucas e Natália Oliveira com 5 estrelas).
-10. SEÇÃO FAQ COMPLETA (Perguntas + Respostas detalhadas com acordeão expansível).
-11. CTA FINAL persuasivo direcionando para o WhatsApp.
-12. FOOTER completo com © 2026 e botão fixo flutuante do WhatsApp.
-
-SCRIPTS E ANIMAÇÕES (ANTES DE FECHAR O </body>):
-  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-  <script>
-    AOS.init({ duration: 800, once: true });
-    
-    // Script Interativo do FAQ
-    document.addEventListener('DOMContentLoaded', () => {
-      const faqButtons = document.querySelectorAll('.faq-btn');
-      faqButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const content = btn.nextElementSibling;
-          const icon = btn.querySelector('.faq-icon');
-          if (content) {
-            content.classList.toggle('hidden');
-            if (icon) {
-              icon.classList.toggle('rotate-180');
-            }
-          }
-        });
-      });
-    });
-  </script>
-
-FORMATO OBRIGATÓRIO DA RESPOSTA:
-Retorne EXCLUSIVAMENTE o código HTML5 completo do <!DOCTYPE html> até </html>.
-Não escreva nenhuma explicação antes ou depois do código.
-Não utilize Markdown nem blocos de código tipo \`\`\`html.
+E terminar exatamente com:
+</html>
 `;
 
-    // Chamada para a API da Qwen (DashScope)
+    // 6. EXECUÇÃO DA CHAMADA À IA
     const respQwen = await fetch(QWEN_URL, {
       method: 'POST',
       headers: {
@@ -209,47 +208,54 @@ Não utilize Markdown nem blocos de código tipo \`\`\`html.
       body: JSON.stringify({
         model: "qwen-max",
         messages: [
-          { role: "system", content: "Você é um compilador de código HTML/Tailwind de nível internacional. Retorne EXCLUSIVAMENTE o código HTML5 puro funcional com design ultra-moderno, ano 2026 no rodapé, depoimentos de Ana Clara, João Lucas e Natália Oliveira, FAQ expansível sem markdown." },
-          { role: "user", content: promptMaster }
+          { 
+            role: "system", 
+            content: "Você é um compilador de código HTML/Tailwind CSS de nível internacional. Sua função é gerar EXCLUSIVAMENTE o código HTML5 puro, sem explicações, sem texto antes ou depois e sem blocos de código Markdown." 
+          },
+          { 
+            role: "user", 
+            content: promptMaster 
+          }
         ],
-        temperature: 0.5
+        temperature: 0.4
       })
     });
 
     const dataQwen = await respQwen.json();
 
     if (dataQwen.error) {
-      console.error("Erro na Qwen:", dataQwen.error);
+      console.error("Erro na resposta da Qwen:", dataQwen.error);
       return res.status(400).json({ success: false, error: `Erro na IA: ${dataQwen.error.message}` });
     }
 
     let siteHtml = dataQwen?.choices?.[0]?.message?.content || "";
 
-    // Limpeza de marcações markdown
+    // 7. LIMPEZA RÍGIDA DE MARCAÇÕES MARKDOWN
     siteHtml = siteHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
 
     if (!siteHtml || siteHtml.length < 100) {
       return res.status(500).json({ success: false, error: 'A IA não retornou um código HTML válido.' });
     }
 
-    // Notificação do Robô no Railway
+    // 8. NOTIFICAÇÃO VIA ROBÔ DO RAILWAY (WhatsApp)
     const URL_ROBO = 'https://bot-whatsapp-production-c379.up.railway.app/send-message';
-    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional Premium foi gerado com sucesso!\n\nAcesse a plataforma para visualizar a prévia completa em tela cheia.`;
+    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional de alta conversão foi gerado com sucesso pela nossa Inteligência Artificial!\n\nAcesse a plataforma para visualizar a prévia completa em tela cheia.`;
 
     try {
       await fetch(URL_ROBO, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ number: numeroLimpo, text: textoMensagem })
+        body: JSON.stringify({ number: whatsappLimpo, text: textoMensagem })
       });
     } catch (eRobo) {
-      console.error("Erro no robô:", eRobo);
+      console.error("Erro no envio do aviso do robô:", eRobo);
     }
 
+    // 9. RETORNO PARA O FRONTEND
     return res.status(200).json({ success: true, html: siteHtml });
 
   } catch (error) {
-    console.error('Erro na API:', error);
+    console.error('Erro no servidor/handler:', error);
     return res.status(500).json({ success: false, error: error.message });
   }
 }
