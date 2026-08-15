@@ -430,7 +430,7 @@
         <div class="grid-2">
           <div class="input-group">
             <label>Seu WhatsApp (com DDD) *</label>
-            <input type="tel" id="whatsapp" placeholder="Ex: 11999999999" required>
+            <input type="tel" id="whatsapp" placeholder="Ex: 5543984620902" required>
           </div>
 
           <div class="input-group">
@@ -461,7 +461,7 @@
     <div id="loading-screen">
       <div class="spinner"></div>
       <h2>Sua Inteligência Artificial está trabalhando...</h2>
-      <div class="status-step" id="status-text">📱 Enviando confirmação inicial para seu WhatsApp...</div>
+      <div class="status-step" id="status-text">📱 Conectando com a API e gerando seu site...</div>
     </div>
 
     <!-- TELA DO SITE GERADO E CONTADOR DE EXPIRAÇÃO -->
@@ -491,14 +491,13 @@
   </div>
 
   <script>
-    // 1. LÓGICA DO PWA (Instalação e Notificação Pop-up)
+    // 1. LÓGICA DO PWA (Instalação)
     let deferredPrompt;
     const btnInstalar = document.getElementById('btn-instalar');
     const popup = document.getElementById('popup-instalacao');
     const btnPopupInstalar = document.getElementById('btn-popup-instalar');
     const iosPrompt = document.getElementById('ios-prompt');
 
-    // Detectar iOS
     const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
 
@@ -506,20 +505,13 @@
       iosPrompt.style.display = 'block';
     }
 
-    // Evento disparado pelo celular para permitir a instalação
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      
       btnInstalar.style.display = 'block';
-      
-      // Abre o pop-up animado no rodapé após 1.5 segundos
-      setTimeout(() => {
-        popup.classList.add('show');
-      }, 1500);
+      setTimeout(() => { popup.classList.add('show'); }, 1500);
     });
 
-    // Ação do Botão do Topo
     btnInstalar.addEventListener('click', () => {
       btnInstalar.style.display = 'none';
       if (deferredPrompt) {
@@ -528,7 +520,6 @@
       }
     });
 
-    // Ação do Botão do Pop-up Flutuante
     btnPopupInstalar.addEventListener('click', () => {
       popup.classList.remove('show');
       if (deferredPrompt) {
@@ -537,12 +528,11 @@
       }
     });
 
-    // Registrar Service Worker
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js');
     }
 
-    // 2. SUBMISSÃO DO FORMULÁRIO E FLUXO DA IA
+    // 2. SUBMISSÃO REAL PARA A API DA VERCEL + DISPARO NO RAILWAY
     const form = document.getElementById('site-form');
     const loadingScreen = document.getElementById('loading-screen');
     const resultScreen = document.getElementById('result-screen');
@@ -555,6 +545,12 @@
       form.style.display = 'none';
       loadingScreen.style.display = 'block';
 
+      // Tratamento do WhatsApp (deixa apenas números e garante o 55)
+      let numWhatsapp = document.getElementById('whatsapp').value.replace(/\D/g, '');
+      if (!numWhatsapp.startsWith('55')) {
+        numWhatsapp = '55' + numWhatsapp;
+      }
+
       const dados = {
         nome: document.getElementById('nome').value,
         nicho: document.getElementById('nicho').value,
@@ -563,27 +559,44 @@
         servicos: document.getElementById('servicos').value,
         estilo: document.getElementById('estilo').value,
         cta: document.getElementById('cta').value || 'Entrar em Contato',
-        whatsapp: document.getElementById('whatsapp').value,
+        whatsapp: numWhatsapp,
         redes: document.getElementById('redes').value,
         endereco: document.getElementById('endereco').value,
         horario: document.getElementById('horario').value
       };
 
-      // Simulação das etapas do processo da IA
-      setTimeout(() => {
-        statusText.innerText = "🤖 IA desenhando o layout e escrevendo os textos do seu site...";
-      }, 3000);
+      try {
+        statusText.innerText = "🤖 Enviando pedido para a Inteligência Artificial...";
 
-      setTimeout(() => {
-        statusText.innerText = "🚀 Finalizando e enviando o link pronto para o seu WhatsApp...";
-      }, 6000);
+        // Chamada REAL para a API /api/gerar na Vercel
+        const response = await fetch('/api/gerar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            nome: dados.nome,
+            whatsapp: dados.whatsapp,
+            ideia: `${dados.nicho} - ${dados.descricao}`
+          })
+        });
 
-      // Conclusão
+        const resData = await response.json();
+
+        if (resData.success) {
+          statusText.innerText = "🚀 Notificação enviada para o WhatsApp com sucesso!";
+        } else {
+          console.error("Erro na API:", resData.error);
+          statusText.innerText = "⚠️ Erro ao enviar mensagem, mas gerando prévia...";
+        }
+
+      } catch (err) {
+        console.error("Erro na requisição:", err);
+      }
+
+      // Conclusão e Exibição do Resultado
       setTimeout(() => {
         loadingScreen.style.display = 'none';
         resultScreen.style.display = 'block';
         
-        // Gera um modelo prévio visual básico no Iframe
         sitePreview.srcdoc = `
           <!DOCTYPE html>
           <html lang="pt-BR">
@@ -600,16 +613,16 @@
             <p>${dados.descricao}</p>
             <h3 style="margin-top: 20px;">Nossos Serviços</h3>
             <p>${dados.servicos}</p>
-            <a href="https://wa.me/55${dados.whatsapp.replace(/\D/g, '')}" class="btn">${dados.cta}</a>
+            <a href="https://wa.me/${dados.whatsapp}" class="btn">${dados.cta}</a>
           </body>
           </html>
         `;
 
-        startTimer(30 * 60); // Inicia o cronômetro de 30 minutos
-      }, 8000);
+        startTimer(30 * 60);
+      }, 2000);
     });
 
-    // 3. CRONÔMETRO REGRESSIVO DE 30 MINUTOS
+    // 3. CRONÔMETRO
     function startTimer(duration) {
       let timer = duration, minutes, seconds;
       const display = document.getElementById('timer');
