@@ -369,25 +369,33 @@
             <input type="checkbox" id="check_logo" onchange="toggleBox('box-logo', this.checked)">
             <span>Tenho uma Logo</span>
           </label>
-          <label class="checkbox-card">
-            <input type="checkbox" id="check_imagens" onchange="toggleBox('box-imagens', this.checked)">
-            <span>Tenho Imagens Próprias</span>
-          </label>
         </div>
 
         <div id="box-logo" class="conditional-box">
           <div class="input-group">
-            <label>Link da Sua Logo (Google Drive/Dropbox/Imgur)</label>
+            <label>Link da Sua Logo (Google Drive/Imgur/Unsplash)</label>
             <input type="url" id="link_logo" placeholder="https://...">
           </div>
         </div>
+      </div>
 
-        <div id="box-imagens" class="conditional-box">
-          <div class="input-group">
-            <label>Link da Pasta com Imagens Próprias</label>
-            <input type="url" id="link_imagens" placeholder="https://drive.google.com/...">
+      <!-- SEÇÃO NOVA: IMAGENS PRÓPRIAS E LEGENDAS -->
+      <div class="form-section">
+        <div class="section-title">📸 Imagens e Fotos do Site</div>
+        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+          Adicione as imagens que deseja exibir no site e explique do que se trata cada uma (ex: Foto de fundo, Foto do produto, Foto da equipe, etc.):
+        </p>
+
+        <div id="lista-imagens-personalizadas">
+          <div class="dynamic-item">
+            <input type="url" class="imagem-url" placeholder="Link da Imagem (Ex: https://imgur.com/suafoto.jpg)" style="margin-bottom: 8px;">
+            <input type="text" class="imagem-descricao" placeholder="Sobre o que é a imagem? (Ex: Foto da fachada da loja / Foto do fundador)">
           </div>
         </div>
+
+        <button type="button" class="btn-add" onclick="addDynamicItem('lista-imagens-personalizadas', 'imagem')">
+          + Adicionar Outra Imagem e Legenda
+        </button>
       </div>
 
       <!-- SEÇÃO 3: Estrutura do Site e Seções -->
@@ -647,7 +655,7 @@
       }
     }
 
-    // 3. ADICIONAR ITENS DINÂMICOS
+    // 3. ADICIONAR ITENS DINÂMICOS (Serviços, Produtos, Depoimentos, FAQ e Imagens)
     function addDynamicItem(containerId, tipo) {
       const container = document.getElementById(containerId);
       const div = document.createElement('div');
@@ -667,13 +675,30 @@
       } else if (tipo === 'faq') {
         html += '<input type="text" class="faq-pergunta" placeholder="Pergunta" style="margin-bottom: 8px;">';
         html += '<input type="text" class="faq-resposta" placeholder="Resposta curta">';
+      } else if (tipo === 'imagem') {
+        html += '<input type="url" class="imagem-url" placeholder="Link da Imagem (Ex: https://...)" style="margin-bottom: 8px;">';
+        html += '<input type="text" class="imagem-descricao" placeholder="Sobre o que é a imagem? (Ex: Foto da fachada da loja)">';
       }
 
       div.innerHTML = html;
       container.appendChild(div);
     }
 
-    // 4. SUBMISSÃO DO FORMULÁRIO E RESPOSTA DA IA
+    // 4. CAPTURA DE TODAS AS IMAGENS COM SUAS RESPECTIVAS DESCRIÇÕES
+    function obterImagensPersonalizadas() {
+      const listaImagens = [];
+      const itens = document.querySelectorAll('#lista-imagens-personalizadas .dynamic-item');
+      itens.forEach(item => {
+        const url = item.querySelector('.imagem-url')?.value;
+        const descricao = item.querySelector('.imagem-descricao')?.value;
+        if (url) {
+          listaImagens.push({ url, descricao });
+        }
+      });
+      return listaImagens;
+    }
+
+    // 5. SUBMISSÃO DO FORMULÁRIO E RESPOSTA DA IA
     let htmlGeradoPelaIA = "";
 
     const form = document.getElementById('site-form');
@@ -697,7 +722,8 @@
         cor_primaria: document.getElementById('cor_primaria').value,
         cor_secundaria: document.getElementById('cor_secundaria').value,
         cta_texto: document.getElementById('cta_texto').value,
-        whatsapp: document.getElementById('whatsapp').value
+        whatsapp: document.getElementById('whatsapp').value,
+        imagens_personalizadas: obterImagensPersonalizadas() // Envia a lista de imagens e descrições para o backend
       };
 
       form.style.display = 'none';
@@ -705,7 +731,7 @@
 
       // Mensagens de progresso durante a geração da IA
       setTimeout(() => { statusText.innerText = "🎨 Criando estrutura visual com Tailwind CSS e fontes..."; }, 4000);
-      setTimeout(() => { statusText.innerText = "✍️ Escrevendo cópias de vendas, depoimentos e seção sobre a empresa..."; }, 9000);
+      setTimeout(() => { statusText.innerText = "✍️ Escrevendo cópias de vendas, organizando imagens e depoimentos..."; }, 9000);
       setTimeout(() => { statusText.innerText = "📲 Finalizando o código e avisando no seu WhatsApp..."; }, 15000);
 
       try {
