@@ -1,5 +1,5 @@
 export default async function handler(req, res) {
-  // Configurações de CORS para aceitar chamadas da Vercel/Front-end
+  // Configuração de CORS para liberar requisições do seu site
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -15,17 +15,17 @@ export default async function handler(req, res) {
       return res.status(400).json({ success: false, error: 'O número de WhatsApp é obrigatório!' });
     }
 
-    // 1. Tratamento do número de WhatsApp
+    // 1. Limpeza e formatação do número do WhatsApp
     let numeroLimpo = String(whatsapp).replace(/\D/g, '');
     if (!numeroLimpo.startsWith('55')) {
       numeroLimpo = '55' + numeroLimpo;
     }
 
-    // 2. CHAVE DA API DO GEMINI
-    const GEMINI_API_KEY = process.env.GEMINI_API_KEY || "AQ.Ab8RN6ID9x8n7fsfNckbQfChF4pdBYH-K3bO8vjPZsLcRufgMg";
-    const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    // 2. CONFIGURAÇÕES DA API DA QWEN (DashScope / Alibaba Cloud)
+    const QWEN_API_KEY = process.env.QWEN_API_KEY || "sk-ws-H.DMEDIDR.A3e2.MEQCIBYvIBLMRQFijb7-GkusJzYzSbGUbSgRRNT_OFjGY2A3AiBvQiqyvky59UjJrwnpj6LhN6wSYGUfT6wqE3hnFSyhWQ";
+    const QWEN_URL = "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions";
 
-    // 3. Tratamento das imagens enviadas pelo cliente
+    // 3. Validação e tratamento das imagens personalizadas enviadas pelo cliente
     let instrucaoGaleriaImagens = "O CLIENTE NÃO ENVIOU IMAGENS PERSONALIZADAS. NUNCA CRIE UMA GALERIA OU QUADROS DE IMAGEM VAZIOS/SKELETONS NA PÁGINA. IGNORE ESSA SEÇÃO COMPLETAMENTE.";
     if (imagens_personalizadas && Array.isArray(imagens_personalizadas) && imagens_personalizadas.length > 0) {
       const fotosValidas = imagens_personalizadas.filter(img => img.url && img.url.trim().length > 5);
@@ -35,10 +35,10 @@ export default async function handler(req, res) {
       }
     }
 
-    // 4. PROMPT MASTER COMPLETO PARA A IA
+    // 4. PROMPT MASTER COMPLETO PARA A IA QWEN
     const promptMaster = `
 Você é um Engenheiro de Software Front-end e UX/UI Designer Sênior de nível internacional, especialista em criação de landing pages modernas, responsivas, visualmente sofisticadas e focadas em alta conversão.
-Sua missão é criar o código HTML5 completo de uma landing page de altíssima qualidade, utilizando as informações fornecidas abaixo.
+Sua missão é criar o código HTML5 completo de uma landing page de altísima qualidade, utilizando as informações fornecidas abaixo.
 
 REFERÊNCIA DE ESTILO, ESTRUTURA E QUALIDADE:
 Utilize como principal referência o seguinte site: https://pyerry-diniz-nutri-personal.vercel.app/
@@ -120,34 +120,42 @@ Não escreva nenhuma explicação antes ou depois do código.
 Não utilize Markdown nem blocos de código tipo \`\`\`html.
 `;
 
-    // 5. Chamada para a API da Gemini
-    const respGemini = await fetch(GEMINI_URL, {
+    // 5. Chamada para a API da Qwen (Qwen-Max / Qwen-Plus)
+    const respQwen = await fetch(QWEN_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Authorization': `Bearer ${QWEN_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: promptMaster }] }]
+        model: "qwen-max",
+        messages: [
+          { role: "system", content: "Você é um compilador e gerador de código HTML/Tailwind de nível internacional. Retorne EXCLUSIVAMENTE o código HTML5 puro funcional, sem markdown, sem caixas de código e sem texto explicativo." },
+          { role: "user", content: promptMaster }
+        ],
+        temperature: 0.5
       })
     });
 
-    const dataGemini = await respGemini.json();
+    const dataQwen = await respQwen.json();
 
-    if (dataGemini.error) {
-      console.error("Erro no Gemini:", dataGemini.error);
-      return res.status(400).json({ success: false, error: `Erro na IA: ${dataGemini.error.message}` });
+    if (dataQwen.error) {
+      console.error("Erro na Qwen:", dataQwen.error);
+      return res.status(400).json({ success: false, error: `Erro na IA: ${dataQwen.error.message || JSON.stringify(dataQwen.error)}` });
     }
 
-    let siteHtml = dataGemini?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    let siteHtml = dataQwen?.choices?.[0]?.message?.content || "";
 
-    // Limpeza de marcações de bloco da IA
+    // Limpeza rigorosa de marcações markdown
     siteHtml = siteHtml.replace(/```html/gi, '').replace(/```/g, '').trim();
 
     if (!siteHtml || siteHtml.length < 100) {
-      return res.status(500).json({ success: false, error: 'A IA não retornou um código HTML válido.' });
+      return res.status(500).json({ success: false, error: 'A IA Qwen não retornou um código HTML válido.' });
     }
 
-    // 6. Notificação do Robô no Railway
+    // 6. Notificação do Robô do WhatsApp no Railway
     const URL_ROBO = 'https://bot-whatsapp-production-c379.up.railway.app/send-message';
-    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional Premium foi gerado com sucesso pela nossa Inteligência Artificial!\n\nAcesse a plataforma para visualizar a prévia completa em tela cheia.`;
+    const textoMensagem = `Olá, ${nome}! 🚀\n\nSeu site profissional Premium foi gerado com sucesso pela nossa Inteligência Artificial (Qwen)!\n\nAcesse a plataforma para visualizar a prévia completa em tela cheia.`;
 
     try {
       await fetch(URL_ROBO, {
